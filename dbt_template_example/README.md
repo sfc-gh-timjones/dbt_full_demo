@@ -1,4 +1,4 @@
-# dbt_comprehensive_example
+# dbt_template_example
 
 Provider data transformation project built on Snowflake. Transforms raw provider and vendor data through staging, intermediate, and marts layers following [dbt best practices](https://docs.getdbt.com/best-practices/how-we-structure/1-guide-overview).
 
