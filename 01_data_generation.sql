@@ -2,19 +2,6 @@
 -- PROD_RAW_DB Setup Script
 -- Builds PROD_RAW_DB.ORACLE with all source tables and synthetic data.
 --
--- Row count strategy: original counts × 5, ratios preserved across tables.
---   ORACLE.PROV              154,916  →   774,580
---   ORACLE.PROV_ADDR         193,978  →   969,890
---   ORACLE.PROV_ASSOCIATE    213,582  → 1,067,910
---   ORACLE.PROV_COMMUNICATION 38,102  →   190,510
---   ORACLE.PROV_LANGUAGE       4,666  →    23,330
---   ORACLE.PROV_TAXONOMY     152,055  →   760,275
---   ORACLE.PRV_XREF          746,647  → 3,733,235
---   ORACLE.PRV_XREF1         746,536  → 3,732,680
---   ORACLE.VENDOR             34,221  →   171,105
---   ORACLE.VENDOR_ADDRESS     38,151  →   190,755
---   ORACLE.VENDOR_PROVIDER_REF 48,772 →   243,860
---   ORACLE.VENDOR_TAXONOMY       225  →     1,125
 --
 -- Owner: SYSADMIN (EXECUTE AS OWNER)
 -- Usage:
@@ -616,3 +603,9 @@ $$;
 -- Execute the setup
 -- ==========================================================================
 CALL PROD_RAW_DB.PUBLIC.SETUP_DEMO_DATA();
+
+-- ==========================================================================
+-- Clone PROD_RAW_DB into DEV and TEST environments
+-- ==========================================================================
+CREATE OR REPLACE DATABASE DEV_RAW_DB  CLONE PROD_RAW_DB;
+CREATE OR REPLACE DATABASE TEST_RAW_DB CLONE PROD_RAW_DB;
