@@ -1,0 +1,29 @@
+version: 2
+
+sources:
+  - name: oracle
+    database: PROD_RAW_DB
+    schema: ORACLE
+    tables:
+      - name: prov
+        description: Core provider master table
+      - name: prov_addr
+        description: Provider address records
+      - name: prov_associate
+        description: Provider-to-provider association relationships
+      - name: prov_communication
+        description: Provider phone, fax, email, and URL records
+      - name: prov_language
+        description: Languages spoken by providers
+      - name: prov_taxonomy
+        description: Provider taxonomy/specialty codes
+      - name: prv_xref1
+        description: Provider cross-reference identifiers (NPI, DEA, Medicaid ID, etc.)
+      - name: vendor
+        description: Vendor master table
+      - name: vendor_address
+        description: Vendor address records
+      - name: vendor_provider_ref
+        description: Vendor-to-provider relationships
+      - name: vendor_taxonomy
+        description: Vendor taxonomy/specialty codes
