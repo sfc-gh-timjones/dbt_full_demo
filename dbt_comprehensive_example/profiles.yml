@@ -1,0 +1,10 @@
+default:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      role: SYSADMIN
+      warehouse: WH_XS
+      database: DEMO
+      schema: DEMO
+      threads: 8
