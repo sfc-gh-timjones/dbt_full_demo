@@ -1,6 +1,6 @@
 -- Vendor roster: vendors with contract status and their associated provider counts
 with links as (
-    select * from {{ ref('int_vendor_provider_links') }}
+    select * from {{ ref('int_vendor_providers_joined') }}
 ),
 
 vendors as (

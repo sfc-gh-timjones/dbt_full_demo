@@ -1,6 +1,6 @@
 -- Full provider directory: one row per provider with address, taxonomy, and NPI
 with profile as (
-    select * from {{ ref('int_provider_profile') }}
+    select * from {{ ref('int_providers_enriched') }}
 ),
 
 npis as (

@@ -1,6 +1,6 @@
 -- Provider network summary: count and breakdown of each provider's active associations
 with network as (
-    select * from {{ ref('int_provider_network') }}
+    select * from {{ ref('int_provider_associations_resolved') }}
 )
 
 select

@@ -9,7 +9,7 @@ contact as (
         primary_phone,
         email,
         languages_spoken
-    from {{ ref('int_provider_contact_info') }}
+    from {{ ref('int_providers_contact_pivoted') }}
 )
 
 select
