@@ -595,7 +595,7 @@ BEGIN
       rn                                                                               AS VEN_TAX_KEY
   FROM (SELECT ROW_NUMBER() OVER (ORDER BY SEQ4()) AS rn FROM TABLE(GENERATOR(ROWCOUNT => 1125)));
 
-  RETURN 'PROD_RAW_DB setup complete. All 12 Bronze tables loaded at 5x original row counts.';
+  RETURN 'PROD_RAW_DB setup complete. All 12 Bronze tables loaded.';
 END;
 $$;
 
@@ -604,8 +604,3 @@ $$;
 -- ==========================================================================
 CALL PROD_RAW_DB.PUBLIC.SETUP_DEMO_DATA();
 
--- ==========================================================================
--- Clone PROD_RAW_DB into DEV and TEST environments
--- ==========================================================================
-CREATE OR REPLACE DATABASE DEV_RAW_DB  CLONE PROD_RAW_DB;
-CREATE OR REPLACE DATABASE TEST_RAW_DB CLONE PROD_RAW_DB;
