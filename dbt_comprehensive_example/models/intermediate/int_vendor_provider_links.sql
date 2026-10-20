@@ -1,6 +1,6 @@
 -- Vendor-to-provider relationships enriched with vendor and provider details
 with vendor_provider_refs as (
-    select * from {{ ref('stg_vendor_provider_refs') }}
+    select * from {{ ref('stg_oracle__vendor_provider_refs') }}
     where is_active = true
 ),
 
@@ -11,7 +11,7 @@ vendors as (
         has_active_contract,
         contract_eff_date,
         contract_end_date
-    from {{ ref('stg_vendors') }}
+    from {{ ref('stg_oracle__vendors') }}
 ),
 
 providers as (
@@ -22,7 +22,7 @@ providers as (
         county,
         area,
         is_credentialed
-    from {{ ref('stg_providers') }}
+    from {{ ref('stg_oracle__providers') }}
 )
 
 select

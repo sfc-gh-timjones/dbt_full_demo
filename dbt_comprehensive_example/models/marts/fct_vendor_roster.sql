@@ -4,7 +4,7 @@ with links as (
 ),
 
 vendors as (
-    select * from {{ ref('stg_vendors') }}
+    select * from {{ ref('stg_oracle__vendors') }}
 ),
 
 vendor_addresses as (
@@ -14,7 +14,7 @@ vendor_addresses as (
         city,
         state,
         zip
-    from {{ ref('stg_vendor_addresses') }}
+    from {{ ref('stg_oracle__vendor_addresses') }}
     where is_active = true
     qualify row_number() over (partition by vendor_id order by effective_date desc) = 1
 )

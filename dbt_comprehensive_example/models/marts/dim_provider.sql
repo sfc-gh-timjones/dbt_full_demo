@@ -7,7 +7,7 @@ npis as (
     select
         provider_id,
         identifier_value                             as npi
-    from {{ ref('stg_provider_xrefs') }}
+    from {{ ref('stg_oracle__provider_xrefs') }}
     where identifier_type = 'NPI'
     qualify row_number() over (partition by provider_id order by effective_date desc) = 1
 )

@@ -1,7 +1,7 @@
 -- Provider contact info: merge phone/fax/email from address and communication tables
 with providers as (
     select provider_id, provider_code, provider_type, county, area
-    from {{ ref('stg_providers') }}
+    from {{ ref('stg_oracle__providers') }}
 ),
 
 addresses as (
@@ -9,7 +9,7 @@ addresses as (
         provider_id,
         phone                                        as address_phone,
         fax                                          as address_fax
-    from {{ ref('stg_provider_addresses') }}
+    from {{ ref('stg_oracle__provider_addresses') }}
     where addr_type = 'PRACTICE'
       and is_active = true
     qualify row_number() over (partition by provider_id order by effective_date desc) = 1
@@ -28,7 +28,7 @@ communications as (
                  then communication_value end)       as fax,
         max(case when communication_type = 'URL'
                  then communication_value end)       as website
-    from {{ ref('stg_provider_communications') }}
+    from {{ ref('stg_oracle__provider_communications') }}
     group by provider_id
 ),
 
@@ -36,7 +36,7 @@ languages as (
     select
         provider_id,
         listagg(language, ', ') within group (order by language) as languages_spoken
-    from {{ ref('stg_provider_languages') }}
+    from {{ ref('stg_oracle__provider_languages') }}
     where is_active = true
     group by provider_id
 )

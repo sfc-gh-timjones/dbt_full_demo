@@ -1,6 +1,6 @@
 -- Credentialing overview: provider credentialing breakdown by county, area, and type
 with providers as (
-    select * from {{ ref('stg_providers') }}
+    select * from {{ ref('stg_oracle__providers') }}
 ),
 
 contact as (

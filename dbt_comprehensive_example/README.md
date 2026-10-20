@@ -16,13 +16,14 @@ Source data lives in the `ORACLE` schema of the respective raw database.
 
 ```
 models/
-  staging/          # Views — 1:1 with source tables, light renaming and casting
+  staging/
+    oracle/         # Views — 1:1 with ORACLE source tables, named stg_oracle__<entity>
   intermediate/     # Views — joining/enriching staging models
   marts/            # Tables — business-facing dims and facts
 ```
 
-### Staging (11 models)
-Light transformations directly on `ORACLE` source tables. One model per source table. Named `stg_<entity>`.
+### Staging (11 models — `staging/oracle/`)
+Light transformations directly on `ORACLE` source tables. Named `stg_oracle__<entity>`.
 
 | Model | Source Table |
 |---|---|

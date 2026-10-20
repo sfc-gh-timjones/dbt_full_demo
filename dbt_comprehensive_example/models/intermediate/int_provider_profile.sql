@@ -1,18 +1,18 @@
 -- Enriched provider profile: core provider + primary practice address + primary taxonomy
 with providers as (
-    select * from {{ ref('stg_providers') }}
+    select * from {{ ref('stg_oracle__providers') }}
 ),
 
 addresses as (
     select *
-    from {{ ref('stg_provider_addresses') }}
+    from {{ ref('stg_oracle__provider_addresses') }}
     where addr_type = 'PRACTICE'
       and is_active = true
 ),
 
 taxonomies as (
     select *
-    from {{ ref('stg_provider_taxonomies') }}
+    from {{ ref('stg_oracle__provider_taxonomies') }}
     where is_primary = true
       and is_active = true
 ),

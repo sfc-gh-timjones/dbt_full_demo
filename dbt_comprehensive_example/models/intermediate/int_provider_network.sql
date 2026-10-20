@@ -1,6 +1,6 @@
 -- Provider network: resolve both sides of each active association with provider details
 with associates as (
-    select * from {{ ref('stg_provider_associates') }}
+    select * from {{ ref('stg_oracle__provider_associates') }}
     where is_active = true
 ),
 
@@ -12,7 +12,7 @@ providers as (
         county,
         area,
         is_credentialed
-    from {{ ref('stg_providers') }}
+    from {{ ref('stg_oracle__providers') }}
 )
 
 select
