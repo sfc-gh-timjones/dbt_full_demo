@@ -1,10 +1,13 @@
 default:
   target: dev
   outputs:
-    dev:
+    default:
       type: snowflake
-      role: SYSADMIN
-      warehouse: WH_XS
-      database: DEMO
-      schema: DEMO
-      threads: 8
+      account: ""       # e.g. myorg-myaccount
+      user: ""          # your Snowflake username
+      authenticator: externalbrowser
+      role:      "{{ env_var('DBT_CURRENT_ROLE') }}"
+      database:  "{{ env_var('DBT_DATABASE') }}"
+      warehouse: "{{ env_var('DBT_WAREHOUSE') }}"
+      schema:    "{{ env_var('DBT_SCHEMA') }}"
+      threads: 4
