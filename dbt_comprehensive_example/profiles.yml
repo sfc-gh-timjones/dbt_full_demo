@@ -9,5 +9,5 @@ default:
       role:      "{{ env_var('DBT_CURRENT_ROLE') }}"
       database:  "{{ env_var('DBT_DATABASE') }}"
       warehouse: "{{ env_var('DBT_WAREHOUSE') }}"
-      schema:    "{{ env_var('DBT_SCHEMA') }}"
+      schema:    "{{ env_var('DBT_ENV_SCHEMA_PREFIX', 'PUBLIC') }}"
       threads: 4
