@@ -102,56 +102,39 @@ EXECUTE TASK PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT;
 
 ## Step 7 — Run dbt
 
-The dbt project lives in `dbt_template_example/`. Copy `profiles.yml` to `~/.dbt/profiles.yml`, or pass `--profiles-dir .` to use the project-local copy.
+The dbt project is run directly from the Snowflake workspace using the built-in dbt runner. Open the `dbt_template_example/` folder in the workspace file browser.
 
-The profile reads all connection details from environment variables:
+### Expand the output panel
 
-| Variable | Description |
-|---|---|
-| `DBT_CURRENT_ROLE` | Snowflake role |
-| `DBT_DATABASE` | Target analytics database |
-| `DBT_WAREHOUSE` | Warehouse to run dbt on |
-| `DBT_SOURCE_DB` | Raw database to read from |
+Before running, expand the bottom output panel so you can see build results. Click the panel expand icon in the bottom toolbar (the two-rectangle icon):
 
-### Dev
+![Expand bottom panel](docs/images/expand-panel.png)
 
-```bash
-export DBT_CURRENT_ROLE=DEV_ANALYTICS_RL
-export DBT_DATABASE=DEV_ANALYTICS_DB
-export DBT_WAREHOUSE=DEV_ANALYTICS_WH
-export DBT_SOURCE_DB=DEV_RAW_DB
+### Run dev
 
-cd dbt_template_example
-dbt run --full-refresh
-```
+In the bottom panel, confirm **Profile** shows `env_dr...` (env_driven). Set **Environment** to `dev` and click **Build**.
 
-### Test
+![Build dev](docs/images/build-dev.png)
 
-```bash
-export DBT_CURRENT_ROLE=TEST_ANALYTICS_RL
-export DBT_DATABASE=TEST_ANALYTICS_DB
-export DBT_WAREHOUSE=TEST_ANALYTICS_WH
-export DBT_SOURCE_DB=TEST_RAW_DB
+### Run test
 
-dbt run --full-refresh
-```
+Set **Environment** to `test` and click **Build**.
 
-### Prod
+![Build test](docs/images/build-test.png)
 
-```bash
-export DBT_CURRENT_ROLE=PROD_ANALYTICS_RL
-export DBT_DATABASE=PROD_ANALYTICS_DB
-export DBT_WAREHOUSE=PROD_ANALYTICS_WH
-export DBT_SOURCE_DB=PROD_RAW_DB
+### Run prod
 
-dbt run
-```
+Set **Environment** to `prod` and click **Build**.
 
-Always use `--full-refresh` on first run and after every re-clone. This rebuilds `dim_provider` from scratch and recreates `fct_provider_county_summary`'s change stream, which breaks when the source schema is replaced by the daily task.
+![Build prod](docs/images/build-prod.png)
 
-Production uses plain `dbt run` (incremental). Rows on or after the current watermark merge safely without duplication.
+### Troubleshooting
 
-> **Warning:** Running `dbt run` without `--full-refresh` in dev/test after a re-clone will not error, but `fct_provider_county_summary` (the Dynamic Table) will remain broken until `--full-refresh` is run.
+If the build output shows **"Query could not start"**, click **Build** again and it will run successfully.
+
+![Query could not start](docs/images/query-could-not-start.png)
+
+> Always run dev and test with the full build (the `build` command in `env.yml` includes `--full-refresh`). This rebuilds `dim_provider` from scratch and recreates `fct_provider_county_summary`'s change stream, which breaks when the source schema is replaced by the daily re-clone task.
 
 ---
 
