@@ -43,7 +43,6 @@ You can now open and run the SQL scripts directly from the workspace file browse
 ## Step 3 — Seed PROD with historical data
 
 **Script:** `01_historical_data_generation.sql`
-**Run as:** SYSADMIN
 
 Open the script in a SQL Worksheet and run the entire file top to bottom.
 
@@ -59,7 +58,6 @@ What it does:
 ## Step 4 — Clone PROD into DEV and TEST
 
 **Script:** `02_clone_prod_raw.sql`
-**Run as:** SYSADMIN
 
 Creates `DEV_RAW_DB` and `TEST_RAW_DB`, then clones `PROD_RAW_DB.ORACLE` into each at the schema level. The `PUBLIC` schema (tasks + procedures) is never touched — it stays empty in DEV and TEST.
 
@@ -68,7 +66,6 @@ Creates `DEV_RAW_DB` and `TEST_RAW_DB`, then clones `PROD_RAW_DB.ORACLE` into ea
 ## Step 5 — Create roles, databases, warehouses, and grants
 
 **Script:** `03_analytics_env_setup.sql`
-**Run as:** ACCOUNTADMIN (the script switches roles internally as needed)
 
 Creates:
 - Roles: `DEV_ANALYTICS_RL`, `TEST_ANALYTICS_RL`, `PROD_ANALYTICS_RL`
@@ -85,7 +82,6 @@ At the end of this script your current user is granted all three analytics roles
 ## Step 6 — Set up the daily pipeline
 
 **Script:** `04_incremental_data.sql`
-**Run as:** SYSADMIN
 
 Creates:
 - `CHANGE_TRACKING` enabled on `PROV` and `VENDOR` in all three raw databases (required for the Dynamic Table)
