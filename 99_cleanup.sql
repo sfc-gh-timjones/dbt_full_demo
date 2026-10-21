@@ -9,11 +9,14 @@
 -- ==========================================================================
 
 -- --------------------------------------------------------------------------
--- Scheduled task  (SYSADMIN — task owner)
--- Must be suspended and dropped before PROD_RAW_DB is dropped, otherwise
--- Snowflake will refuse to drop a database that owns an active task.
+-- Scheduled tasks  (SYSADMIN — task owner)
+-- Child task must be suspended before the root task and before ADMIN_DB is dropped.
 -- --------------------------------------------------------------------------
 USE ROLE SYSADMIN;
+
+ALTER TASK IF EXISTS ADMIN_DB.PUBLIC.DAILY_CLONE_REFRESH SUSPEND;
+DROP TASK      IF EXISTS ADMIN_DB.PUBLIC.DAILY_CLONE_REFRESH;
+DROP PROCEDURE IF EXISTS ADMIN_DB.PUBLIC.REFRESH_DEV_TEST_CLONES();
 
 ALTER TASK IF EXISTS PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT SUSPEND;
 DROP TASK      IF EXISTS PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT;
@@ -27,6 +30,8 @@ USE ROLE ACCOUNTADMIN;
 DROP DATABASE IF EXISTS DEV_ANALYTICS_DB;
 DROP DATABASE IF EXISTS TEST_ANALYTICS_DB;
 DROP DATABASE IF EXISTS PROD_ANALYTICS_DB;
+
+DROP DATABASE IF EXISTS ADMIN_DB;
 
 DROP DATABASE IF EXISTS DEV_RAW_DB;
 DROP DATABASE IF EXISTS TEST_RAW_DB;

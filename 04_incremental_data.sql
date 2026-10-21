@@ -171,6 +171,8 @@ $$;
 -- --------------------------------------------------------------------------
 -- Scheduled task: run INSERT_INCREMENTAL_DATA daily at 8am Mountain Time
 -- Uses America/Denver so Snowflake adjusts automatically for MDT/MST.
+-- This is the ROOT task of the graph. A chained child task (DAILY_CLONE_REFRESH)
+-- runs automatically after this succeeds, refreshing DEV and TEST raw databases.
 -- --------------------------------------------------------------------------
 CREATE OR REPLACE TASK PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT
   WAREHOUSE = DEV_ANALYTICS_WH
@@ -179,26 +181,95 @@ CREATE OR REPLACE TASK PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT
 AS
   CALL PROD_RAW_DB.PUBLIC.INSERT_INCREMENTAL_DATA();
 
+-- --------------------------------------------------------------------------
+-- Stored procedure: REFRESH_DEV_TEST_CLONES
+-- Re-clones PROD_RAW_DB into DEV_RAW_DB and TEST_RAW_DB, then re-applies the
+-- schema and table grants that the clone operation does not preserve.
+--
+-- Grant mechanics:
+--   COPY GRANTS keeps the database-level USAGE grant (copied from the old clone
+--   being replaced). Schema USAGE and table SELECT are on new objects that carry
+--   PROD's grants after cloning, so we re-grant them explicitly.
+--   FUTURE TABLE grants require MANAGE GRANTS (even for the owner) and are
+--   intentionally omitted — the cloned schema is static post-clone.
+--   CHANGE_TRACKING is a table property and is carried over by the clone
+--   automatically, as long as 04 has already enabled it on PROD.
+-- --------------------------------------------------------------------------
+CREATE OR REPLACE PROCEDURE ADMIN_DB.PUBLIC.REFRESH_DEV_TEST_CLONES()
+  RETURNS VARCHAR
+  LANGUAGE SQL
+  EXECUTE AS OWNER          -- runs as SYSADMIN, which owns all raw databases
+AS
+$$
+BEGIN
+    -- -----------------------------------------------------------------------
+    -- Re-clone DEV_RAW_DB
+    -- -----------------------------------------------------------------------
+    CREATE OR REPLACE DATABASE DEV_RAW_DB CLONE PROD_RAW_DB COPY GRANTS;
+
+    -- Drop cloned task/procedure — both write to PROD_RAW_DB, not DEV
+    DROP TASK      IF EXISTS DEV_RAW_DB.PUBLIC.DAILY_DATA_INSERT;
+    DROP PROCEDURE IF EXISTS DEV_RAW_DB.PUBLIC.INSERT_INCREMENTAL_DATA();
+
+    -- Re-apply schema and table grants (new objects carry PROD's grants)
+    GRANT USAGE  ON SCHEMA   DEV_RAW_DB.ORACLE            TO ROLE DEV_ANALYTICS_RL;
+    GRANT SELECT ON ALL TABLES IN DATABASE DEV_RAW_DB      TO ROLE DEV_ANALYTICS_RL;
+
+    -- -----------------------------------------------------------------------
+    -- Re-clone TEST_RAW_DB (same pattern)
+    -- -----------------------------------------------------------------------
+    CREATE OR REPLACE DATABASE TEST_RAW_DB CLONE PROD_RAW_DB COPY GRANTS;
+
+    DROP TASK      IF EXISTS TEST_RAW_DB.PUBLIC.DAILY_DATA_INSERT;
+    DROP PROCEDURE IF EXISTS TEST_RAW_DB.PUBLIC.INSERT_INCREMENTAL_DATA();
+
+    GRANT USAGE  ON SCHEMA   TEST_RAW_DB.ORACLE            TO ROLE TEST_ANALYTICS_RL;
+    GRANT SELECT ON ALL TABLES IN DATABASE TEST_RAW_DB      TO ROLE TEST_ANALYTICS_RL;
+
+    RETURN 'DEV_RAW_DB and TEST_RAW_DB refreshed from PROD_RAW_DB.';
+END;
+$$;
+
+-- --------------------------------------------------------------------------
+-- Child task: re-clone DEV/TEST after the daily insert succeeds.
+-- AFTER clause chains this to DAILY_DATA_INSERT — no separate CRON needed.
+-- Dev and test dbt jobs must run --full-refresh after this task completes,
+-- which also recreates fct_provider_county_summary with a fresh change stream.
+-- --------------------------------------------------------------------------
+CREATE OR REPLACE TASK ADMIN_DB.PUBLIC.DAILY_CLONE_REFRESH
+  WAREHOUSE = DEV_ANALYTICS_WH
+  AFTER     PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT
+  COMMENT   = 'Re-clones DEV_RAW_DB and TEST_RAW_DB from PROD after daily insert succeeds'
+AS
+  CALL ADMIN_DB.PUBLIC.REFRESH_DEV_TEST_CLONES();
+
 -- Tasks start suspended by default; resume to activate.
 -- NOTE: SYSADMIN requires EXECUTE TASK ON ACCOUNT and USAGE on DEV_ANALYTICS_WH.
 -- Both are granted in 03_remaining_setup.sql. Run that script before this one.
-ALTER TASK PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT RESUME;
+--
+-- Resume order: child tasks must be resumed BEFORE the root task.
+ALTER TASK ADMIN_DB.PUBLIC.DAILY_CLONE_REFRESH        RESUME;  -- child first
+ALTER TASK PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT        RESUME;  -- root last
 
 -- --------------------------------------------------------------------------
 -- To run immediately (manual trigger / testing):
 -- --------------------------------------------------------------------------
 -- EXECUTE TASK PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT;
+-- (DAILY_CLONE_REFRESH fires automatically once the above succeeds.)
 
 -- --------------------------------------------------------------------------
 -- To switch to every 2 hours (e.g. for demo day):
+-- Only the root task's schedule needs changing; the clone child follows.
 -- --------------------------------------------------------------------------
 -- ALTER TASK PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT SUSPEND;
 -- ALTER TASK PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT
 --   SET SCHEDULE = 'USING CRON 0 */2 * * * America/Denver';
+-- ALTER TASK ADMIN_DB.PUBLIC.DAILY_CLONE_REFRESH RESUME;
 -- ALTER TASK PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT RESUME;
 --
 -- To revert to daily 8am MT:
 -- ALTER TASK PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT SUSPEND;
 -- ALTER TASK PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT
 --   SET SCHEDULE = 'USING CRON 0 8 * * * America/Denver';
+-- ALTER TASK ADMIN_DB.PUBLIC.DAILY_CLONE_REFRESH RESUME;
 -- ALTER TASK PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT RESUME;
