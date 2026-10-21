@@ -237,8 +237,8 @@ $$;
 -- --------------------------------------------------------------------------
 CREATE OR REPLACE TASK PROD_RAW_DB.PUBLIC.DAILY_CLONE_REFRESH
   WAREHOUSE = DEV_ANALYTICS_WH
-  AFTER     PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT
   COMMENT   = 'Re-clones DEV/TEST ORACLE schema from PROD after daily insert succeeds'
+  AFTER     PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT
 AS
   CALL PROD_RAW_DB.PUBLIC.REFRESH_DEV_TEST_CLONES();
 
