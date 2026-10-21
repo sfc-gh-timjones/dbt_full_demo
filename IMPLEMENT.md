@@ -31,8 +31,12 @@ This only needs to be done once per account. Skip this step if your account alre
 
 1. In Snowsight, open **Projects → Workspaces** and choose **New Workspace → From Git Repository**.
 2. Paste the repo URL: `https://github.com/sfc-gh-timjones/dbt_full_demo`
-3. Select the integration created in Step 1 and choose the `dev` branch.
-4. Snowflake clones the repo into your workspace. You can now open and run the SQL scripts directly from the workspace file browser.
+3. Give the workspace a name (or leave the default).
+4. Select the integration created in Step 1.
+5. Choose **Public repository**.
+6. Click **Create**.
+
+You can now open and run the SQL scripts directly from the workspace file browser.
 
 ---
 
