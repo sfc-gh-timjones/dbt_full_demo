@@ -11,19 +11,23 @@
 -- Provider network summary aggregated by county and provider type.
 -- Materialized as a Snowflake Dynamic Table with a 1-hour target lag.
 --
--- Snowflake manages refresh automatically: when new rows land in PROV
--- (via the DAILY_DATA_INSERT task), this table updates within ~1 hour
--- without any dbt job running.
+-- In PROD: Snowflake manages refresh automatically. When the DAILY_DATA_INSERT
+-- task appends rows to PROD_RAW_DB.ORACLE.PROV, the change stream detects the
+-- delta and this table updates within ~1 hour — no dbt job needed.
 --
--- What makes this work:
---   - stg_oracle__providers is a regular view over PROD_RAW_DB.ORACLE.PROV
---   - PROV has CHANGE_TRACKING = TRUE (set in 02_incremental_data.sql)
+-- In DEV/TEST: the DAILY_CLONE_REFRESH task replaces DEV_RAW_DB.ORACLE with a
+-- fresh schema-level clone. That replacement breaks the dynamic table's change
+-- stream. A plain dbt run leaves it in place (SQL unchanged). Always run
+-- dbt run --full-refresh after a dev/test clone to recreate it cleanly.
+--
+-- What makes the PROD auto-refresh work:
+--   - stg_oracle__providers is a view over the environment's ORACLE.PROV table
+--   - PROV has CHANGE_TRACKING = TRUE (set in 04_incremental_data.sql)
 --   - Snowflake tracks row-level deltas on PROV directly; change tracking
---     does not flow from one table through a view into another — the view
---     is transparent and PROV is the actual tracked object
+--     does not flow from one table through a view — PROV is the tracked object
 --
 -- Contrast with dim_provider (incremental): that model only refreshes when
--- dbt runs. This model refreshes on Snowflake's schedule regardless.
+-- dbt runs. This model refreshes on Snowflake's schedule in prod.
 
 select
     county,

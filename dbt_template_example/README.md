@@ -75,8 +75,21 @@ Run the setup scripts in order before executing dbt:
 
 ## Running dbt
 
+**First run or after a dev/test re-clone** — always full-refresh to rebuild the marts
+cleanly and recreate `fct_provider_county_summary` with a fresh change stream:
+
 ```bash
 dbt deps
-dbt run --target dev
+dbt run --full-refresh --target dev
 dbt test --target dev
 ```
+
+**Production incremental run** — processes only new rows since the last run:
+
+```bash
+dbt run --target dev   # (point DBT_DATABASE at PROD_ANALYTICS_DB and PROD_RAW_DB)
+```
+
+> A normal `dbt run` without `--full-refresh` in dev/test will silently produce no
+> new rows — the rebuilt clone has no rows past the existing watermark — and will
+> leave `fct_provider_county_summary` in a broken change-tracking state.

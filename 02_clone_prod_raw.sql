@@ -9,13 +9,18 @@ CREATE OR REPLACE DATABASE DEV_RAW_DB  CLONE PROD_RAW_DB;
 CREATE OR REPLACE DATABASE TEST_RAW_DB CLONE PROD_RAW_DB;
 
 -- --------------------------------------------------------------------------
--- Drop the cloned task and procedure from DEV and TEST.
--- Cloning copies all objects including the task and stored procedure, both
--- of which are hard-coded to write to PROD_RAW_DB. Resuming a clone's copy
--- would silently insert into production data. Drop them to eliminate the risk.
+-- Drop the cloned tasks and procedures from DEV and TEST.
+-- On initial setup (02 runs before 04), these objects don't exist yet and
+-- the drops are no-ops. If someone re-runs 02 after 04 has already populated
+-- PROD_RAW_DB.PUBLIC, all four objects will be present in the clones and must
+-- be dropped — they all write to or re-clone PROD_RAW_DB.
 -- The live versions remain in PROD_RAW_DB.PUBLIC.
 -- --------------------------------------------------------------------------
 DROP TASK      IF EXISTS DEV_RAW_DB.PUBLIC.DAILY_DATA_INSERT;
+DROP TASK      IF EXISTS DEV_RAW_DB.PUBLIC.DAILY_CLONE_REFRESH;
 DROP PROCEDURE IF EXISTS DEV_RAW_DB.PUBLIC.INSERT_INCREMENTAL_DATA();
+DROP PROCEDURE IF EXISTS DEV_RAW_DB.PUBLIC.REFRESH_DEV_TEST_CLONES();
 DROP TASK      IF EXISTS TEST_RAW_DB.PUBLIC.DAILY_DATA_INSERT;
+DROP TASK      IF EXISTS TEST_RAW_DB.PUBLIC.DAILY_CLONE_REFRESH;
 DROP PROCEDURE IF EXISTS TEST_RAW_DB.PUBLIC.INSERT_INCREMENTAL_DATA();
+DROP PROCEDURE IF EXISTS TEST_RAW_DB.PUBLIC.REFRESH_DEV_TEST_CLONES();
