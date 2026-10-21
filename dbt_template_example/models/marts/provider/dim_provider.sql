@@ -20,7 +20,7 @@ with new_providers as (
         last_modified_date
     from {{ ref('stg_oracle__providers') }}
     {% if is_incremental() %}
-    where last_modified_date > (select max(last_modified_date) from {{ this }})
+    where last_modified_date >= (select max(last_modified_date) from {{ this }})
     {% endif %}
 ),
 

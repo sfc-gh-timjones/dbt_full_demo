@@ -146,8 +146,8 @@ BEGIN
     SELECT
         'VEN-' || LPAD((:max_vendor + MOD(rn - 1, :vendor_batch) + 1)::VARCHAR, 8, '0')
                                                                        AS VENDOR_ID,
-        -- link to providers near the most recently added batch
-        MOD(:max_prov + rn, 774580) + 1                               AS PROV_REC_ID,
+        -- link to the newly inserted providers (IDs max_prov+1 through max_prov+prov_batch)
+        :max_prov + MOD(rn - 1, :prov_batch) + 1                      AS PROV_REC_ID,
         CURRENT_DATE()                                                 AS EFFECTIVE_DATE,
         NULL                                                           AS END_DATE,
         'DAILY_TASK'                                                   AS LAST_MODIFIED_BY,
@@ -167,17 +167,18 @@ $$;
 
 -- --------------------------------------------------------------------------
 -- Scheduled task: run INSERT_INCREMENTAL_DATA daily at 8am Mountain Time
--- 8am MDT = 15:00 UTC (summer).  Snowflake CRON does not auto-adjust for DST;
--- during MST (winter) this fires at 9am MT instead.
+-- Uses America/Denver so Snowflake adjusts automatically for MDT/MST.
 -- --------------------------------------------------------------------------
 CREATE OR REPLACE TASK PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT
   WAREHOUSE = DEV_ANALYTICS_WH
-  SCHEDULE  = 'USING CRON 0 15 * * * UTC'
+  SCHEDULE  = 'USING CRON 0 8 * * * America/Denver'
   COMMENT   = 'Inserts ~200 new source records daily to drive incremental dbt models'
 AS
   CALL PROD_RAW_DB.PUBLIC.INSERT_INCREMENTAL_DATA();
 
 -- Tasks start suspended by default; resume to activate.
+-- NOTE: SYSADMIN requires EXECUTE TASK ON ACCOUNT privilege to resume tasks.
+-- That grant is in 04_remaining_setup.sql. Run that script before resuming.
 ALTER TASK PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT RESUME;
 
 -- --------------------------------------------------------------------------
@@ -190,11 +191,11 @@ ALTER TASK PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT RESUME;
 -- --------------------------------------------------------------------------
 -- ALTER TASK PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT SUSPEND;
 -- ALTER TASK PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT
---   SET SCHEDULE = 'USING CRON 0 */2 * * * UTC';
+--   SET SCHEDULE = 'USING CRON 0 */2 * * * America/Denver';
 -- ALTER TASK PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT RESUME;
 --
 -- To revert to daily 8am MT:
 -- ALTER TASK PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT SUSPEND;
 -- ALTER TASK PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT
---   SET SCHEDULE = 'USING CRON 0 15 * * * UTC';
+--   SET SCHEDULE = 'USING CRON 0 8 * * * America/Denver';
 -- ALTER TASK PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT RESUME;

@@ -13,9 +13,14 @@
 --
 -- Snowflake manages refresh automatically: when new rows land in PROV
 -- (via the DAILY_DATA_INSERT task), this table updates within ~1 hour
--- without any dbt job running. CHANGE_TRACKING on PROV is enabled in
--- 02_incremental_data.sql; the CHANGE_TRACKING post-hook on dim_provider
--- propagates tracking through the stg_oracle__providers view.
+-- without any dbt job running.
+--
+-- What makes this work:
+--   - stg_oracle__providers is a regular view over PROD_RAW_DB.ORACLE.PROV
+--   - PROV has CHANGE_TRACKING = TRUE (set in 02_incremental_data.sql)
+--   - Snowflake tracks row-level deltas on PROV directly; change tracking
+--     does not flow from one table through a view into another — the view
+--     is transparent and PROV is the actual tracked object
 --
 -- Contrast with dim_provider (incremental): that model only refreshes when
 -- dbt runs. This model refreshes on Snowflake's schedule regardless.

@@ -32,6 +32,10 @@ GRANT OWNERSHIP ON DATABASE PROD_ANALYTICS_DB TO ROLE PROD_ANALYTICS_RL COPY CUR
 -- --------------------------------------------------------------------------
 USE ROLE ACCOUNTADMIN;
 
+-- SYSADMIN needs EXECUTE TASK to resume/suspend the DAILY_DATA_INSERT task
+-- in PROD_RAW_DB. This privilege is account-level and only ACCOUNTADMIN can grant it.
+GRANT EXECUTE TASK ON ACCOUNT TO ROLE SYSADMIN;
+
 CREATE WAREHOUSE IF NOT EXISTS DEV_ANALYTICS_WH
     WAREHOUSE_SIZE   = XSMALL
     AUTO_SUSPEND     = 30
