@@ -209,17 +209,20 @@ BEGIN
     -- -----------------------------------------------------------------------
     -- Re-clone the ORACLE schema only.
     -- PUBLIC is left untouched — tasks/procedures there are not copied.
+    -- COPY GRANTS is not supported inside a Snowflake Scripting block, so
+    -- schema USAGE and table SELECT are re-applied explicitly instead.
     -- -----------------------------------------------------------------------
-    CREATE OR REPLACE SCHEMA DEV_RAW_DB.ORACLE CLONE PROD_RAW_DB.ORACLE COPY GRANTS;
+    CREATE OR REPLACE SCHEMA DEV_RAW_DB.ORACLE CLONE PROD_RAW_DB.ORACLE;
 
-    -- Re-apply table SELECT grants (cloned tables carry PROD's grants, not DEV's)
+    GRANT USAGE  ON SCHEMA  DEV_RAW_DB.ORACLE              TO ROLE DEV_ANALYTICS_RL;
     GRANT SELECT ON ALL TABLES IN SCHEMA DEV_RAW_DB.ORACLE TO ROLE DEV_ANALYTICS_RL;
 
     -- -----------------------------------------------------------------------
     -- Re-clone TEST_RAW_DB (same pattern)
     -- -----------------------------------------------------------------------
-    CREATE OR REPLACE SCHEMA TEST_RAW_DB.ORACLE CLONE PROD_RAW_DB.ORACLE COPY GRANTS;
+    CREATE OR REPLACE SCHEMA TEST_RAW_DB.ORACLE CLONE PROD_RAW_DB.ORACLE;
 
+    GRANT USAGE  ON SCHEMA  TEST_RAW_DB.ORACLE              TO ROLE TEST_ANALYTICS_RL;
     GRANT SELECT ON ALL TABLES IN SCHEMA TEST_RAW_DB.ORACLE TO ROLE TEST_ANALYTICS_RL;
 
     RETURN 'DEV_RAW_DB.ORACLE and TEST_RAW_DB.ORACLE refreshed from PROD_RAW_DB.ORACLE.';
