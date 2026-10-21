@@ -83,6 +83,8 @@ BEGIN
 
   -- ========================================================================
   -- ORACLE.PROV_ADDR  (193,978 → 969,890)
+  -- NOTE: Customer schema has a surrogate PK on this table. To match, add:
+  --   ADDR_REC_ID  NUMBER  (= rn, inserted as the first column)
   -- ========================================================================
   CREATE OR REPLACE TABLE PROD_RAW_DB.ORACLE.PROV_ADDR (
       ADDR_TYPE          VARCHAR,
@@ -224,6 +226,8 @@ BEGIN
 
   -- ========================================================================
   -- ORACLE.PROV_COMMUNICATION  (38,102 → 190,510)
+  -- NOTE: Customer schema has a surrogate PK on this table. To match, add:
+  --   COMM_REC_ID  NUMBER  (= rn, inserted as the first column)
   -- ========================================================================
   CREATE OR REPLACE TABLE PROD_RAW_DB.ORACLE.PROV_COMMUNICATION (
       COMM_TYPE          VARCHAR,
@@ -299,6 +303,8 @@ BEGIN
 
   -- ========================================================================
   -- ORACLE.PROV_TAXONOMY  (152,055 → 760,275)
+  -- NOTE: Customer schema has a surrogate PK on this table. To match, add:
+  --   TAX_REC_ID  NUMBER  (= rn, inserted as the first column)
   -- ========================================================================
   CREATE OR REPLACE TABLE PROD_RAW_DB.ORACLE.PROV_TAXONOMY (
       PROV_REC_ID        NUMBER,
@@ -332,6 +338,8 @@ BEGIN
 
   -- ========================================================================
   -- ORACLE.PRV_XREF  (746,647 → 3,733,235)
+  -- NOTE: Customer schema has a surrogate PK on this table. To match, add:
+  --   XREF_REC_ID  NUMBER  (= rn, inserted as the first column)
   -- ========================================================================
   CREATE OR REPLACE TABLE PROD_RAW_DB.ORACLE.PRV_XREF (
       C1                 VARCHAR,

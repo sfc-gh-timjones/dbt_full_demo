@@ -5,6 +5,8 @@ models:
     description: >
       Full provider directory. One row per provider with NPI, primary taxonomy,
       primary practice address, credentialing status, and age.
+      Materialized as an incremental table: each dbt run upserts only providers
+      whose last_modified_date is newer than the current max in this table.
     columns:
       - name: provider_id
         tests: [not_null, unique]
@@ -16,6 +18,26 @@ models:
         tests:
           - accepted_values:
               values: [ACTIVE, PENDING, EXPIRED]
+      - name: last_modified_date
+        description: >
+          Source system last-modified date cast to DATE. Used as the incremental
+          watermark: rows with a date newer than the table's current max are
+          included in the next dbt run.
+        tests: [not_null]
+
+  - name: fct_provider_county_summary
+    description: >
+      Provider counts aggregated by county and provider type. Materialized as a
+      Snowflake Dynamic Table with a 1-hour target lag. Snowflake refreshes this
+      automatically when upstream source data changes — no dbt job needed.
+      CHANGE_TRACKING on PROV (source table) is enabled in 02_incremental_data.sql.
+    columns:
+      - name: county
+        tests: [not_null]
+      - name: provider_type
+        tests: [not_null]
+      - name: total_providers
+        tests: [not_null]
 
   - name: fct_provider_network_summary
     description: >

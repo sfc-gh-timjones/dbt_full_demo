@@ -9,6 +9,17 @@
 -- ==========================================================================
 
 -- --------------------------------------------------------------------------
+-- Scheduled task  (SYSADMIN — task owner)
+-- Must be suspended and dropped before PROD_RAW_DB is dropped, otherwise
+-- Snowflake will refuse to drop a database that owns an active task.
+-- --------------------------------------------------------------------------
+USE ROLE SYSADMIN;
+
+ALTER TASK IF EXISTS PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT SUSPEND;
+DROP TASK      IF EXISTS PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT;
+DROP PROCEDURE IF EXISTS PROD_RAW_DB.PUBLIC.INSERT_INCREMENTAL_DATA();
+
+-- --------------------------------------------------------------------------
 -- Analytics and raw databases  (ACCOUNTADMIN — can drop regardless of owner)
 -- --------------------------------------------------------------------------
 USE ROLE ACCOUNTADMIN;
