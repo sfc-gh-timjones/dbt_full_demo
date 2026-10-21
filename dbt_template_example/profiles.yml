@@ -1,7 +1,7 @@
 default:
-  target: dev
+  target: env_driven
   outputs:
-    dev:
+    env_driven:
       type: snowflake
       account: ""       # e.g. myorg-myaccount
       user: ""          # your Snowflake username
