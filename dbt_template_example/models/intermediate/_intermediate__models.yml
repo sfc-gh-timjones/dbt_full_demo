@@ -7,7 +7,12 @@ models:
       active taxonomy code. One row per provider.
     columns:
       - name: provider_id
-        tests: [not_null, unique]
+        tests:
+          - not_null
+          - unique
+          - relationships:
+              to: ref('stg_oracle__providers')
+              field: provider_id
       - name: provider_type
         tests: [not_null]
 
@@ -42,6 +47,10 @@ models:
       - name: vendor_provider_key
         tests: [not_null, unique]
       - name: vendor_id
-        tests: [not_null]
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_oracle__vendors')
+              field: vendor_id
       - name: provider_id
         tests: [not_null]

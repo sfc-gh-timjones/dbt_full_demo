@@ -29,17 +29,17 @@ Light transformations directly on `ORACLE` source tables. Named `stg_oracle__<en
 
 | Model | Source Table |
 |---|---|
-| stg_providers | PROV |
-| stg_provider_addresses | PROV_ADDR |
-| stg_provider_associates | PROV_ASSOCIATE |
-| stg_provider_communications | PROV_COMMUNICATION |
-| stg_provider_languages | PROV_LANGUAGE |
-| stg_provider_taxonomies | PROV_TAXONOMY |
-| stg_provider_xrefs | PRV_XREF1 |
-| stg_vendors | VENDOR |
-| stg_vendor_addresses | VENDOR_ADDRESS |
-| stg_vendor_provider_refs | VENDOR_PROVIDER_REF |
-| stg_vendor_taxonomies | VENDOR_TAXONOMY |
+| stg_oracle__providers | PROV |
+| stg_oracle__provider_addresses | PROV_ADDR |
+| stg_oracle__provider_associates | PROV_ASSOCIATE |
+| stg_oracle__provider_communications | PROV_COMMUNICATION |
+| stg_oracle__provider_languages | PROV_LANGUAGE |
+| stg_oracle__provider_taxonomies | PROV_TAXONOMY |
+| stg_oracle__provider_xrefs | PRV_XREF1 |
+| stg_oracle__vendors | VENDOR |
+| stg_oracle__vendor_addresses | VENDOR_ADDRESS |
+| stg_oracle__vendor_provider_refs | VENDOR_PROVIDER_REF |
+| stg_oracle__vendor_taxonomies | VENDOR_TAXONOMY |
 
 ### Intermediate (4 models)
 Join and enrich staging models into reusable building blocks. Named `int_<concept>`.

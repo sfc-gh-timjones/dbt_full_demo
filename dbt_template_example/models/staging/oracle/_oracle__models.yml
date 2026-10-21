@@ -83,7 +83,7 @@ models:
         tests: [not_null]
 
   - name: stg_oracle__provider_xrefs
-    description: Active provider cross-reference identifiers (NPI, DEA, Medicaid ID, etc.).
+    description: Provider cross-reference identifiers (NPI, DEA, Medicaid ID, etc.). Includes all history; use is_active to filter to current records.
     columns:
       - name: provider_id
         tests: [not_null]
