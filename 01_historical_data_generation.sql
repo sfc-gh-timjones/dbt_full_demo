@@ -83,10 +83,9 @@ BEGIN
 
   -- ========================================================================
   -- ORACLE.PROV_ADDR  (193,978 → 969,890)
-  -- NOTE: Customer schema has a surrogate PK on this table. To match, add:
-  --   ADDR_REC_ID  NUMBER  (= rn, inserted as the first column)
   -- ========================================================================
   CREATE OR REPLACE TABLE PROD_RAW_DB.ORACLE.PROV_ADDR (
+      ADDR_REC_ID        NUMBER,         -- surrogate primary key (matches customer schema)
       ADDR_TYPE          VARCHAR,
       LASTNAME           VARCHAR,
       FIRSTNAME          VARCHAR,
@@ -116,6 +115,7 @@ BEGIN
 
   INSERT INTO PROD_RAW_DB.ORACLE.PROV_ADDR
   SELECT
+      rn                                                                                   AS ADDR_REC_ID,
       CASE MOD(rn,4) WHEN 0 THEN 'PRACTICE' WHEN 1 THEN 'HOME'
                      WHEN 2 THEN 'BILLING'   ELSE 'MAILING' END                        AS ADDR_TYPE,
       CASE MOD(rn,8)
@@ -226,10 +226,9 @@ BEGIN
 
   -- ========================================================================
   -- ORACLE.PROV_COMMUNICATION  (38,102 → 190,510)
-  -- NOTE: Customer schema has a surrogate PK on this table. To match, add:
-  --   COMM_REC_ID  NUMBER  (= rn, inserted as the first column)
   -- ========================================================================
   CREATE OR REPLACE TABLE PROD_RAW_DB.ORACLE.PROV_COMMUNICATION (
+      COMM_REC_ID        NUMBER,         -- surrogate primary key (matches customer schema)
       COMM_TYPE          VARCHAR,
       COMM_SUBTYPE       VARCHAR,
       COMM_VALUE         VARCHAR,
@@ -242,6 +241,7 @@ BEGIN
 
   INSERT INTO PROD_RAW_DB.ORACLE.PROV_COMMUNICATION
   SELECT
+      rn                                                                                  AS COMM_REC_ID,
       CASE MOD(rn,4) WHEN 0 THEN 'PHONE' WHEN 1 THEN 'FAX'
                      WHEN 2 THEN 'EMAIL' ELSE 'URL' END                               AS COMM_TYPE,
       CASE MOD(rn,3) WHEN 0 THEN 'OFFICE' WHEN 1 THEN 'AFTER_HOURS'
@@ -303,10 +303,9 @@ BEGIN
 
   -- ========================================================================
   -- ORACLE.PROV_TAXONOMY  (152,055 → 760,275)
-  -- NOTE: Customer schema has a surrogate PK on this table. To match, add:
-  --   TAX_REC_ID  NUMBER  (= rn, inserted as the first column)
   -- ========================================================================
   CREATE OR REPLACE TABLE PROD_RAW_DB.ORACLE.PROV_TAXONOMY (
+      TAX_REC_ID         NUMBER,         -- surrogate primary key (matches customer schema)
       PROV_REC_ID        NUMBER,
       TAXONOMY_CODE      VARCHAR,
       PRIMARY_FLAG       BOOLEAN,
@@ -318,6 +317,7 @@ BEGIN
 
   INSERT INTO PROD_RAW_DB.ORACLE.PROV_TAXONOMY
   SELECT
+      rn                                                                                  AS TAX_REC_ID,
       MOD(rn, 774580) + 1                                                             AS PROV_REC_ID,
       CASE MOD(rn,10)
           WHEN 0 THEN '207Q00000X' WHEN 1 THEN '208000000X' WHEN 2 THEN '207R00000X'
@@ -338,10 +338,9 @@ BEGIN
 
   -- ========================================================================
   -- ORACLE.PRV_XREF  (746,647 → 3,733,235)
-  -- NOTE: Customer schema has a surrogate PK on this table. To match, add:
-  --   XREF_REC_ID  NUMBER  (= rn, inserted as the first column)
   -- ========================================================================
   CREATE OR REPLACE TABLE PROD_RAW_DB.ORACLE.PRV_XREF (
+      XREF_REC_ID        NUMBER,         -- surrogate primary key (matches customer schema)
       C1                 VARCHAR,
       PROV_REC_ID        NUMBER,
       LOB_ID             VARCHAR,
@@ -366,6 +365,7 @@ BEGIN
 
   INSERT INTO PROD_RAW_DB.ORACLE.PRV_XREF
   SELECT
+      rn                                                                                  AS XREF_REC_ID,
       LPAD((MOD(rn,9999) + 1)::VARCHAR, 4, '0')                                      AS C1,
       MOD(rn, 774580) + 1                                                             AS PROV_REC_ID,
       CASE MOD(rn,5) WHEN 0 THEN 'MEDICARE'   WHEN 1 THEN 'MEDICAID'
