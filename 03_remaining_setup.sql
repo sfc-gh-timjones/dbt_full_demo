@@ -4,6 +4,15 @@
 -- ==========================================================================
 
 -- --------------------------------------------------------------------------
+-- Roles  (USERADMIN — must exist before ownership can be transferred)
+-- --------------------------------------------------------------------------
+USE ROLE USERADMIN;
+
+CREATE ROLE IF NOT EXISTS DEV_ANALYTICS_RL;
+CREATE ROLE IF NOT EXISTS TEST_ANALYTICS_RL;
+CREATE ROLE IF NOT EXISTS PROD_ANALYTICS_RL;
+
+-- --------------------------------------------------------------------------
 -- Analytics databases
 -- DEV stays SYSADMIN-owned (developers write interactively).
 -- TEST and PROD ownership is transferred to their role so only CI/CD can write.
@@ -19,9 +28,9 @@ GRANT OWNERSHIP ON DATABASE TEST_ANALYTICS_DB TO ROLE TEST_ANALYTICS_RL COPY CUR
 GRANT OWNERSHIP ON DATABASE PROD_ANALYTICS_DB TO ROLE PROD_ANALYTICS_RL COPY CURRENT GRANTS;
 
 -- --------------------------------------------------------------------------
--- Warehouses  (SYSADMIN)
+-- Warehouses  (ACCOUNTADMIN — limits resize/drop to highest admins)
 -- --------------------------------------------------------------------------
-USE ROLE ACCOUNTADMIN; --Limit who can modify these warehouses to only highest admins.
+USE ROLE ACCOUNTADMIN;
 
 CREATE WAREHOUSE IF NOT EXISTS DEV_ANALYTICS_WH
     WAREHOUSE_SIZE   = XSMALL
@@ -40,15 +49,6 @@ CREATE WAREHOUSE IF NOT EXISTS PROD_ANALYTICS_WH
     AUTO_SUSPEND     = 30
     AUTO_RESUME      = TRUE
     INITIALLY_SUSPENDED = TRUE;
-
--- --------------------------------------------------------------------------
--- Roles  (USERADMIN)
--- --------------------------------------------------------------------------
-USE ROLE USERADMIN;
-
-CREATE ROLE IF NOT EXISTS DEV_ANALYTICS_RL;
-CREATE ROLE IF NOT EXISTS TEST_ANALYTICS_RL;
-CREATE ROLE IF NOT EXISTS PROD_ANALYTICS_RL;
 
 -- --------------------------------------------------------------------------
 -- Role grants  (SECURITYADMIN — has MANAGE GRANTS by default)
