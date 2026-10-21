@@ -93,6 +93,8 @@ dbt test
 dbt run
 ```
 
-> Skip `--full-refresh` in dev/test and dbt silently produces no new rows (the re-cloned
-> tables have no rows past the existing watermark in dim_provider), and leaves
-> `fct_provider_county_summary` in a broken change-tracking state.
+> Skip `--full-refresh` in dev/test and the mart is not fully rebuilt to match the
+> clone: only rows newer than the existing watermark in `dim_provider` are merged,
+> so older history stays as it was before the clone. `fct_provider_county_summary`
+> is also left pointing at the replaced PROV table with a broken change stream.
+> `--full-refresh` fixes both.
