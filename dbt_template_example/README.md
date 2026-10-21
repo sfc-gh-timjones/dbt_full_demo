@@ -66,9 +66,11 @@ Final business-facing models materialized as tables, split into domain schemas (
 Run the setup scripts in order before executing dbt:
 
 ```
-01_data_generation.sql   # Creates PROD_RAW_DB and loads synthetic source data
-02_clone_prod_raw.sql    # Creates DEV_RAW_DB and TEST_RAW_DB as zero-copy clones
-03_remaining_setup.sql   # Creates analytics DBs, warehouses, and roles
+01_historical_data_generation.sql  # Creates PROD_RAW_DB and loads synthetic source data
+02_clone_prod_raw.sql              # Creates DEV_RAW_DB and TEST_RAW_DB as zero-copy clones
+03_remaining_setup.sql             # Creates analytics DBs, warehouses, roles, and grants
+04_incremental_data.sql            # Enables change tracking; creates daily task for ongoing inserts
+99_cleanup.sql                     # Tears down everything (run to reset the demo)
 ```
 
 ## Running dbt
