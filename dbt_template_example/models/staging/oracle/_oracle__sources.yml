@@ -2,7 +2,7 @@ version: 2
 
 sources:
   - name: oracle
-    database: PROD_RAW_DB
+    database: "{{ env_var('DBT_SOURCE_DB') }}"
     schema: ORACLE
     tables:
       - name: prov

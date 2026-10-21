@@ -19,7 +19,9 @@ models/
   staging/
     oracle/         # Views — 1:1 with ORACLE source tables, named stg_oracle__<entity>
   intermediate/     # Views — joining/enriching staging models
-  marts/            # Tables — business-facing dims and facts
+  marts/
+    provider/       # Tables — provider dims and facts
+    vendor/         # Tables — vendor facts
 ```
 
 ### Staging (11 models — `staging/oracle/`)
@@ -44,20 +46,20 @@ Join and enrich staging models into reusable building blocks. Named `int_<concep
 
 | Model | Description |
 |---|---|
-| int_provider_profile | Provider + primary address + primary taxonomy |
-| int_provider_network | Active provider associations with both sides resolved |
-| int_provider_contact_info | Provider phone, email, fax, and languages spoken |
-| int_vendor_provider_links | Vendor × provider relationships enriched |
+| int_providers_enriched | Provider + primary address + primary taxonomy |
+| int_provider_associations_resolved | Active provider associations with both sides resolved |
+| int_providers_contact_pivoted | Provider phone, email, fax, and languages spoken |
+| int_vendor_providers_joined | Vendor × provider relationships enriched |
 
 ### Marts (4 models)
-Final business-facing models materialized as tables.
+Final business-facing models materialized as tables, split into domain schemas (`provider`, `vendor`).
 
-| Model | Type | Description |
-|---|---|---|
-| dim_provider | Dimension | Full provider directory with NPI, address, taxonomy |
-| fct_provider_network_summary | Fact | Association counts per provider by type |
-| fct_vendor_roster | Fact | Vendors with contract status and provider counts |
-| fct_credentialing_overview | Fact | Credentialing breakdown by county, area, and type |
+| Model | Schema | Type | Description |
+|---|---|---|---|
+| dim_provider | `provider` | Dimension | Full provider directory with NPI, address, taxonomy |
+| fct_provider_network_summary | `provider` | Fact | Association counts per provider by type |
+| fct_credentialing_overview | `provider` | Fact | Credentialing breakdown by county, area, and type |
+| fct_vendor_roster | `vendor` | Fact | Vendors with contract status and provider counts |
 
 ## Setup
 

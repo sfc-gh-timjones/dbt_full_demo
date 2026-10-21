@@ -6,7 +6,10 @@ renamed as (
     select
         prov_rec_id                                  as provider_id,
         taxonomy_code,
-        primary_flag                                 as is_primary,
+        case
+            when primary_flag then true
+            else false
+        end                                          as is_primary,
         eff_date                                     as effective_date,
         end_date,
         last_modified_by,

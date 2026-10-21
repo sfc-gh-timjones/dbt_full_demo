@@ -14,7 +14,6 @@ renamed as (
         active                                       as is_active,
         try_cast(last_modified_date as date)         as last_modified_date
     from source
-    where active = true
 )
 
 select * from renamed
