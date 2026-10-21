@@ -94,7 +94,7 @@ dbt run
 ```
 
 > Skip `--full-refresh` in dev/test and the mart is not fully rebuilt to match the
-> clone: only rows newer than the existing watermark in `dim_provider` are merged,
+> clone: only rows on or after the existing watermark date in `dim_provider` are merged,
 > so older history stays as it was before the clone. `fct_provider_county_summary`
 > is also left pointing at the replaced PROV table with a broken change stream.
 > `--full-refresh` fixes both.
