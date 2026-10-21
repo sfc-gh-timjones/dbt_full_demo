@@ -110,6 +110,10 @@ Before running, expand the bottom output panel so you can see build results. Cli
 
 ![Expand bottom panel](docs/images/expand-panel.png)
 
+Make sure the **`dbt_template_example`** tab is selected in the bottom panel — not **Query History**. The Profile and Environment dropdowns will only appear on the dbt tab.
+
+![Select dbt tab, not Query History](docs/images/select-dbt-tab.png)
+
 ### Run dev
 
 In the bottom panel, confirm **Profile** shows `env_dr...` (env_driven). Set **Environment** to `dev` and click **Build**.
