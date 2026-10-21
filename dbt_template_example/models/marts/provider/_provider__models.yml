@@ -1,0 +1,42 @@
+version: 2
+
+models:
+  - name: dim_provider
+    description: >
+      Full provider directory. One row per provider with NPI, primary taxonomy,
+      primary practice address, credentialing status, and age.
+    columns:
+      - name: provider_id
+        tests: [not_null, unique]
+      - name: provider_type
+        tests:
+          - accepted_values:
+              values: [INDIVIDUAL, ORGANIZATION, FACILITY, ANCILLARY, GROUP]
+      - name: credentialing_flag
+        tests:
+          - accepted_values:
+              values: [ACTIVE, PENDING, EXPIRED]
+
+  - name: fct_provider_network_summary
+    description: >
+      One row per provider. Counts active network associations broken down by
+      association type, plus a list of covered lines of business.
+    columns:
+      - name: provider_id
+        tests: [not_null, unique]
+      - name: total_associations
+        tests: [not_null]
+
+  - name: fct_credentialing_overview
+    description: >
+      Credentialing breakdown aggregated by county, area, provider type, and
+      credentialing status. Includes counts, averages, and contact/language flags.
+    columns:
+      - name: county
+        tests: [not_null]
+      - name: provider_type
+        tests: [not_null]
+      - name: credentialing_flag
+        tests:
+          - accepted_values:
+              values: [ACTIVE, PENDING, EXPIRED]

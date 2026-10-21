@@ -1,0 +1,13 @@
+version: 2
+
+models:
+  - name: fct_vendor_roster
+    description: >
+      One row per vendor with contract status, primary address, and aggregated
+      counts of linked providers, credentialed providers, DSNP providers,
+      and counties covered.
+    columns:
+      - name: vendor_id
+        tests: [not_null, unique]
+      - name: total_linked_providers
+        tests: [not_null]

@@ -1,0 +1,47 @@
+version: 2
+
+models:
+  - name: int_providers_enriched
+    description: >
+      Core provider enriched with their primary practice address and primary
+      active taxonomy code. One row per provider.
+    columns:
+      - name: provider_id
+        tests: [not_null, unique]
+      - name: provider_type
+        tests: [not_null]
+
+  - name: int_provider_associations_resolved
+    description: >
+      Active provider-to-provider associations with both sides resolved to
+      provider attributes (type, county, credentialing status).
+    columns:
+      - name: provider_id
+        tests: [not_null]
+      - name: associated_provider_id
+        tests: [not_null]
+      - name: association_type
+        tests:
+          - accepted_values:
+              values: [GROUP_MEMBER, COVERING, PRACTICE_GROUP, SUPERVISING, AFFILIATED]
+
+  - name: int_providers_contact_pivoted
+    description: >
+      Provider contact info pivoted: office phone, after-hours phone, fax, email,
+      and website in one row per provider. Also includes a comma-separated list
+      of spoken languages.
+    columns:
+      - name: provider_id
+        tests: [not_null, unique]
+
+  - name: int_vendor_providers_joined
+    description: >
+      Active vendor-to-provider relationships enriched with vendor contract
+      details and provider attributes.
+    columns:
+      - name: vendor_provider_key
+        tests: [not_null, unique]
+      - name: vendor_id
+        tests: [not_null]
+      - name: provider_id
+        tests: [not_null]

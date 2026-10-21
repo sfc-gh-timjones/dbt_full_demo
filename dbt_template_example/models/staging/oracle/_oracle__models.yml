@@ -1,0 +1,127 @@
+version: 2
+
+models:
+  - name: stg_oracle__providers
+    description: One row per provider. Light cleanup of ORACLE.PROV.
+    columns:
+      - name: provider_id
+        description: Surrogate key (PROV_REC_ID).
+        tests: [not_null, unique]
+      - name: provider_type
+        tests:
+          - accepted_values:
+              values: [INDIVIDUAL, ORGANIZATION, FACILITY, ANCILLARY, GROUP]
+      - name: gender
+        tests:
+          - accepted_values:
+              values: [M, F, U]
+      - name: accessible
+        tests:
+          - accepted_values:
+              values: ['Y', 'N']
+      - name: credentialing_flag
+        tests:
+          - accepted_values:
+              values: [ACTIVE, PENDING, EXPIRED]
+
+  - name: stg_oracle__provider_addresses
+    description: Provider address records. Multiple rows per provider (one per address type).
+    columns:
+      - name: provider_id
+        tests: [not_null]
+      - name: addr_type
+        tests:
+          - accepted_values:
+              values: [PRACTICE, HOME, BILLING, MAILING]
+
+  - name: stg_oracle__provider_associates
+    description: Provider-to-provider association relationships.
+    columns:
+      - name: provider_id
+        tests: [not_null]
+      - name: associated_provider_id
+        tests: [not_null]
+      - name: association_type
+        tests:
+          - accepted_values:
+              values: [GROUP_MEMBER, COVERING, PRACTICE_GROUP, SUPERVISING, AFFILIATED]
+      - name: line_of_business
+        tests:
+          - accepted_values:
+              values: [MEDICARE, MEDICAID, COMMERCIAL, DSNP, CSNP]
+
+  - name: stg_oracle__provider_communications
+    description: Provider phone, fax, email, and URL records.
+    columns:
+      - name: provider_id
+        tests: [not_null]
+      - name: communication_type
+        tests:
+          - accepted_values:
+              values: [PHONE, FAX, EMAIL, URL]
+      - name: communication_subtype
+        tests:
+          - accepted_values:
+              values: [OFFICE, AFTER_HOURS, EMERGENCY]
+
+  - name: stg_oracle__provider_languages
+    description: Languages spoken by providers or their staff.
+    columns:
+      - name: provider_id
+        tests: [not_null]
+      - name: proficiency
+        tests:
+          - accepted_values:
+              values: [FLUENT, PROFICIENT, BASIC, NATIVE]
+
+  - name: stg_oracle__provider_taxonomies
+    description: Provider taxonomy / specialty codes.
+    columns:
+      - name: provider_id
+        tests: [not_null]
+      - name: taxonomy_code
+        tests: [not_null]
+
+  - name: stg_oracle__provider_xrefs
+    description: Active provider cross-reference identifiers (NPI, DEA, Medicaid ID, etc.).
+    columns:
+      - name: provider_id
+        tests: [not_null]
+      - name: identifier_type
+        tests:
+          - accepted_values:
+              values: [NPI, TAX_ID, DEA, UPIN, MEDICAID_ID, INTERNAL]
+      - name: identifier_value
+        tests: [not_null]
+
+  - name: stg_oracle__vendors
+    description: Vendor master. One row per vendor.
+    columns:
+      - name: vendor_id
+        tests: [not_null, unique]
+
+  - name: stg_oracle__vendor_addresses
+    description: Vendor address records.
+    columns:
+      - name: rec_id
+        tests: [not_null, unique]
+      - name: vendor_id
+        tests: [not_null]
+
+  - name: stg_oracle__vendor_provider_refs
+    description: Vendor-to-provider relationships.
+    columns:
+      - name: vendor_provider_key
+        tests: [not_null, unique]
+      - name: vendor_id
+        tests: [not_null]
+      - name: provider_id
+        tests: [not_null]
+
+  - name: stg_oracle__vendor_taxonomies
+    description: Vendor taxonomy / specialty codes.
+    columns:
+      - name: vendor_taxonomy_key
+        tests: [not_null, unique]
+      - name: vendor_id
+        tests: [not_null]
