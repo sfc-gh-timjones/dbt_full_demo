@@ -4,15 +4,10 @@
 -- ==========================================================================
 
 -- --------------------------------------------------------------------------
--- Revoke roles from current user first  (USERADMIN)
+-- Roles  (USERADMIN)
+-- DROP ROLE automatically revokes from all users before dropping.
 -- --------------------------------------------------------------------------
 USE ROLE USERADMIN;
-
-SET current_user_name = (SELECT CURRENT_USER());
-
-REVOKE ROLE DEV_ANALYTICS_RL  FROM USER IDENTIFIER($current_user_name);
-REVOKE ROLE TEST_ANALYTICS_RL FROM USER IDENTIFIER($current_user_name);
-REVOKE ROLE PROD_ANALYTICS_RL FROM USER IDENTIFIER($current_user_name);
 
 DROP ROLE IF EXISTS DEV_ANALYTICS_RL;
 DROP ROLE IF EXISTS TEST_ANALYTICS_RL;
