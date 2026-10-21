@@ -1,6 +1,6 @@
 -- ==========================================================================
 -- Clone PROD_RAW_DB into DEV and TEST environments
--- Run after 02_incremental_data.sql
+-- Run after 01_historical_data_generation.sql
 -- ==========================================================================
 
 USE ROLE SYSADMIN;

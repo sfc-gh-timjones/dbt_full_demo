@@ -17,13 +17,16 @@ USE ROLE SYSADMIN;
 USE DATABASE PROD_RAW_DB;
 
 -- --------------------------------------------------------------------------
--- Enable change tracking on source tables
--- Required by dbt dynamic_table models that read from these tables (or from
--- staging views built on top of them). Without this, CREATE OR REPLACE on
--- upstream models would break the dynamic table's change stream.
+-- Enable change tracking on source tables in all three environments.
+-- Required for dbt dynamic_table models (refresh_mode = INCREMENTAL).
+-- The clones in 02 are made before this runs, so they need explicit alters.
 -- --------------------------------------------------------------------------
 ALTER TABLE PROD_RAW_DB.ORACLE.PROV   SET CHANGE_TRACKING = TRUE;
 ALTER TABLE PROD_RAW_DB.ORACLE.VENDOR SET CHANGE_TRACKING = TRUE;
+ALTER TABLE DEV_RAW_DB.ORACLE.PROV    SET CHANGE_TRACKING = TRUE;
+ALTER TABLE DEV_RAW_DB.ORACLE.VENDOR  SET CHANGE_TRACKING = TRUE;
+ALTER TABLE TEST_RAW_DB.ORACLE.PROV   SET CHANGE_TRACKING = TRUE;
+ALTER TABLE TEST_RAW_DB.ORACLE.VENDOR SET CHANGE_TRACKING = TRUE;
 
 -- --------------------------------------------------------------------------
 -- Stored procedure: INSERT_INCREMENTAL_DATA
@@ -177,8 +180,8 @@ AS
   CALL PROD_RAW_DB.PUBLIC.INSERT_INCREMENTAL_DATA();
 
 -- Tasks start suspended by default; resume to activate.
--- NOTE: SYSADMIN requires EXECUTE TASK ON ACCOUNT privilege to resume tasks.
--- That grant is in 04_remaining_setup.sql. Run that script before resuming.
+-- NOTE: SYSADMIN requires EXECUTE TASK ON ACCOUNT and USAGE on DEV_ANALYTICS_WH.
+-- Both are granted in 03_remaining_setup.sql. Run that script before this one.
 ALTER TASK PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT RESUME;
 
 -- --------------------------------------------------------------------------

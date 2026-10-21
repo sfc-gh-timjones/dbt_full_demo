@@ -7,10 +7,12 @@
 -- Full provider directory: one row per provider with NPI, primary taxonomy,
 -- address, and credentialing status.
 --
--- Incremental logic: on each dbt run, only providers whose last_modified_date
--- is newer than the current max in this table are processed and upserted.
--- The CHANGE_TRACKING post-hook lets downstream dynamic tables (e.g.
--- fct_provider_county_summary) track row-level deltas off this table.
+-- Incremental logic: on each dbt run, providers whose last_modified_date is
+-- on or after the current max in this table are processed and upserted.
+-- Using >= (not >) ensures same-day rows from a second run are not silently
+-- dropped; the merge on unique_key=provider_id handles any overlap safely.
+-- The CHANGE_TRACKING post-hook keeps dim_provider itself trackable for any
+-- downstream dynamic tables that read from it directly.
 
 with new_providers as (
     -- Drive the incremental filter from the grain source table.

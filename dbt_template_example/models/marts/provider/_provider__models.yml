@@ -21,8 +21,9 @@ models:
       - name: last_modified_date
         description: >
           Source system last-modified date cast to DATE. Used as the incremental
-          watermark: rows with a date newer than the table's current max are
-          included in the next dbt run.
+          watermark: rows with a date on or after the table's current max are
+          included in the next dbt run (>= comparison ensures same-day batches
+          are not silently dropped).
         tests: [not_null]
 
   - name: fct_provider_county_summary

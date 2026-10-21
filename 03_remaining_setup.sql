@@ -32,14 +32,6 @@ GRANT OWNERSHIP ON DATABASE PROD_ANALYTICS_DB TO ROLE PROD_ANALYTICS_RL COPY CUR
 -- --------------------------------------------------------------------------
 USE ROLE ACCOUNTADMIN;
 
--- SYSADMIN needs EXECUTE TASK to resume/suspend the DAILY_DATA_INSERT task
--- in PROD_RAW_DB. This privilege is account-level and only ACCOUNTADMIN can grant it.
-GRANT EXECUTE TASK ON ACCOUNT TO ROLE SYSADMIN;
-
--- SYSADMIN also needs USAGE on the warehouse the task runs on.
--- ACCOUNTADMIN owns the warehouse; this grants SYSADMIN the right to use it.
-GRANT USAGE ON WAREHOUSE DEV_ANALYTICS_WH TO ROLE SYSADMIN;
-
 CREATE WAREHOUSE IF NOT EXISTS DEV_ANALYTICS_WH
     WAREHOUSE_SIZE   = XSMALL
     AUTO_SUSPEND     = 30
@@ -57,6 +49,14 @@ CREATE WAREHOUSE IF NOT EXISTS PROD_ANALYTICS_WH
     AUTO_SUSPEND     = 30
     AUTO_RESUME      = TRUE
     INITIALLY_SUSPENDED = TRUE;
+
+-- SYSADMIN needs EXECUTE TASK to resume/suspend the DAILY_DATA_INSERT task
+-- in PROD_RAW_DB. This privilege is account-level and only ACCOUNTADMIN can grant it.
+GRANT EXECUTE TASK ON ACCOUNT TO ROLE SYSADMIN;
+
+-- SYSADMIN also needs USAGE on the warehouse the task runs on.
+-- Must come after the warehouse is created.
+GRANT USAGE ON WAREHOUSE DEV_ANALYTICS_WH TO ROLE SYSADMIN;
 
 -- --------------------------------------------------------------------------
 -- Role grants  (SECURITYADMIN — has MANAGE GRANTS by default)
