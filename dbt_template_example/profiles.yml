@@ -1,7 +1,7 @@
 default:
-  target: snowflake
+  target: dev
   outputs:
-    snowflake:
+    dev:
       type: snowflake
       account: ""       # e.g. myorg-myaccount
       user: ""          # your Snowflake username
