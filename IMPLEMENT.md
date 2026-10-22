@@ -23,7 +23,12 @@ CREATE API INTEGRATION IF NOT EXISTS GIT_HUB_INTEGRATION
   ENABLED              = TRUE;
 ```
 
-This only needs to be done once per account. Skip this step if your account already has a GitHub integration.
+This only needs to be done once per account. If your account already has a `GIT_HUB_INTEGRATION`, verify its allowed prefixes include `https://github.com/` — if not, update it:
+
+```sql
+ALTER API INTEGRATION GIT_HUB_INTEGRATION
+  SET API_ALLOWED_PREFIXES = ('https://github.com/');
+```
 
 ---
 
@@ -151,6 +156,8 @@ Creates:
 - `DAILY_DBT_PROD` task — fires at 9am MT; runs `dbt build` against the `prod` environment
 
 Both tasks fire at 9am MT — one hour after `DAILY_DATA_INSERT` and `DAILY_CLONE_REFRESH` (8am MT) have completed.
+
+> **Troubleshooting:** If `CREATE GIT REPOSITORY` fails with *"Operation 'clone' is not authorized"*, the `GIT_HUB_INTEGRATION` has restrictive allowed prefixes. Run the `ALTER API INTEGRATION` fix from Step 1 and re-run this script.
 
 > **Note:** These tasks run as SYSADMIN. In the CI/CD phase they would be replaced by pipeline jobs running as `TEST_ANALYTICS_RL` and `PROD_ANALYTICS_RL` with least-privilege access.
 
