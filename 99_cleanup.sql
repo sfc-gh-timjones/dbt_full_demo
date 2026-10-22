@@ -25,12 +25,14 @@ DROP TASK  IF EXISTS PROD_RAW_DB.PUBLIC.DAILY_DBT_PROD;
 
 -- --------------------------------------------------------------------------
 -- Tasks: daily data insert + clone refresh (script 04)
--- Drop child task (DAILY_CLONE_REFRESH) before root (DAILY_DATA_INSERT).
+-- Suspend root first (required before modifying any child in the graph),
+-- then suspend + drop child, then drop root.
 -- --------------------------------------------------------------------------
+ALTER TASK IF EXISTS PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT SUSPEND;
+
 ALTER TASK IF EXISTS PROD_RAW_DB.PUBLIC.DAILY_CLONE_REFRESH SUSPEND;
 DROP TASK  IF EXISTS PROD_RAW_DB.PUBLIC.DAILY_CLONE_REFRESH;
 
-ALTER TASK IF EXISTS PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT SUSPEND;
 DROP TASK  IF EXISTS PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT;
 
 -- --------------------------------------------------------------------------
