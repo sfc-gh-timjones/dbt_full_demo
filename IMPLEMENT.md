@@ -97,7 +97,9 @@ EXECUTE TASK PROD_RAW_DB.PUBLIC.DAILY_DATA_INSERT;
 
 ---
 
-## Step 7 — Run dbt
+## Step 7 — Run dbt manually in Snowsight first
+
+> **Note:** Once you verify the manual runs below succeed as expected, Step 8 will create the dbt project object in Snowflake and schedule it to run automatically.
 
 The dbt project is run directly from the Snowflake workspace using the built-in dbt runner. Open the `dbt_template_example/` folder in the workspace file browser.
 
