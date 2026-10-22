@@ -119,6 +119,12 @@ In the bottom panel, confirm **Profile** shows `env_dr...` (env_driven). Set **E
 
 ![Build dev](docs/images/build-dev.png)
 
+### Troubleshooting
+
+If the build output shows **"Query could not start"**, click **Build** again and it will run successfully.
+
+![Query could not start](docs/images/query-could-not-start.png)
+
 ### Run test
 
 Set **Environment** to `test` and click **Build**.
@@ -130,14 +136,6 @@ Set **Environment** to `test` and click **Build**.
 Set **Environment** to `prod` and click **Build**.
 
 ![Build prod](docs/images/build-prod.png)
-
-### Troubleshooting
-
-If the build output shows **"Query could not start"**, click **Build** again and it will run successfully.
-
-![Query could not start](docs/images/query-could-not-start.png)
-
-> Always run dev and test with the full build (the `build` command in `env.yml` includes `--full-refresh`). This rebuilds all models from scratch.
 
 ---
 
