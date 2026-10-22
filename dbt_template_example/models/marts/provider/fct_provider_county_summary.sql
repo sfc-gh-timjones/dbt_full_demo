@@ -1,33 +1,40 @@
 {{ config(
-    materialized            = 'dynamic_table',
-    snowflake_warehouse     = env_var('DBT_WAREHOUSE', 'DEV_ANALYTICS_WH'),
-    target_lag              = '1 hour',
-    refresh_mode            = 'INCREMENTAL',
-    on_configuration_change = 'apply',
-    pre_hook                = 'ALTER DYNAMIC TABLE IF EXISTS {{ this }} SUSPEND',
-    post_hook               = 'ALTER DYNAMIC TABLE IF EXISTS {{ this }} RESUME'
+    materialized = 'incremental',
+    unique_key   = ['county', 'provider_type']
 ) }}
 
 -- Provider network summary aggregated by county and provider type.
--- Materialized as a Snowflake Dynamic Table with a 1-hour target lag.
---
--- In PROD: Snowflake manages refresh automatically. When the DAILY_DATA_INSERT
--- task appends rows to PROD_RAW_DB.ORACLE.PROV, the change stream detects the
--- delta and this table updates within ~1 hour — no dbt job needed.
---
--- In DEV/TEST: the DAILY_CLONE_REFRESH task replaces DEV_RAW_DB.ORACLE with a
--- fresh schema-level clone. That replacement breaks the dynamic table's change
--- stream. A plain dbt run leaves it in place (SQL unchanged). Always run
--- dbt run --full-refresh after a dev/test clone to recreate it cleanly.
---
--- What makes the PROD auto-refresh work:
---   - stg_oracle__providers is a view over the environment's ORACLE.PROV table
---   - PROV has CHANGE_TRACKING = TRUE (set in 04_incremental_data.sql)
---   - Snowflake tracks row-level deltas on PROV directly; change tracking
---     does not flow from one table through a view — PROV is the tracked object
---
--- Contrast with dim_provider (incremental): that model only refreshes when
--- dbt runs. This model refreshes on Snowflake's schedule in prod.
+-- Materialized as an incremental table: on each run, re-aggregates only the
+-- county + provider_type groups that contain providers modified since the last run.
+-- Use dbt run --full-refresh to rebuild the full table from scratch.
+
+with providers as (
+    select * from {{ ref('stg_oracle__providers') }}
+),
+
+{% if is_incremental() %}
+
+affected_groups as (
+    select distinct county, provider_type
+    from providers
+    where last_modified_date >= (select max(latest_modified_date) from {{ this }})
+)
+
+select
+    p.county,
+    p.provider_type,
+    count(*)                                                    as total_providers,
+    count(case when p.is_credentialed             then 1 end)   as credentialed_count,
+    count(case when p.vip_flag                    then 1 end)   as vip_count,
+    count(case when p.hospital_accreditation_flag then 1 end)   as hospital_accredited_count,
+    count(case when p.accessible = 'Y'            then 1 end)   as accessible_count,
+    max(p.last_modified_date)                                   as latest_modified_date
+from providers p
+inner join affected_groups ag
+    on p.county = ag.county and p.provider_type = ag.provider_type
+group by p.county, p.provider_type
+
+{% else %}
 
 select
     county,
@@ -38,5 +45,7 @@ select
     count(case when hospital_accreditation_flag then 1 end)     as hospital_accredited_count,
     count(case when accessible = 'Y'            then 1 end)     as accessible_count,
     max(last_modified_date)                                     as latest_modified_date
-from {{ ref('stg_oracle__providers') }}
+from providers
 group by county, provider_type
+
+{% endif %}

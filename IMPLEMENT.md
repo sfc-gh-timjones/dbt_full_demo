@@ -82,7 +82,6 @@ At the end of this script your current user is granted all three analytics roles
 **Run script:** `04_incremental_data.sql` — open in a SQL Worksheet and run top to bottom, all at once.
 
 Creates:
-- `CHANGE_TRACKING` enabled on `PROV` and `VENDOR` in all three raw databases (required for the Dynamic Table)
 - `INSERT_INCREMENTAL_DATA()` procedure — inserts ~225 records per call
 - `DAILY_DATA_INSERT` task — fires at 8am MT; calls the insert procedure
 - `REFRESH_DEV_TEST_CLONES()` procedure — re-clones `ORACLE` schema into DEV/TEST and re-applies grants
@@ -136,7 +135,7 @@ If the build output shows **"Query could not start"**, click **Build** again and
 
 ![Query could not start](docs/images/query-could-not-start.png)
 
-> Always run dev and test with the full build (the `build` command in `env.yml` includes `--full-refresh`). This rebuilds `dim_provider` from scratch and recreates `fct_provider_county_summary`'s change stream, which breaks when the source schema is replaced by the daily re-clone task.
+> Always run dev and test with the full build (the `build` command in `env.yml` includes `--full-refresh`). This rebuilds all models from scratch.
 
 ---
 

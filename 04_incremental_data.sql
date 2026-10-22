@@ -4,29 +4,15 @@
 -- system activity. Run after 01_historical_data_generation.sql.
 --
 -- What this script does:
---   1. Enables CHANGE_TRACKING on PROV and VENDOR so that downstream
---      Snowflake Dynamic Tables can track row-level deltas.
---   2. Creates a stored procedure (INSERT_INCREMENTAL_DATA) that inserts
+--   1. Creates a stored procedure (INSERT_INCREMENTAL_DATA) that inserts
 --      ~200 new records per call into PROV, VENDOR, and VENDOR_PROVIDER_REF,
 --      continuing from each table's current max key.
---   3. Creates a scheduled Task that calls the procedure daily at 8am MT.
+--   2. Creates a scheduled Task that calls the procedure daily at 8am MT.
 --      A commented-out block below shows how to switch to every 2 hours.
 -- ==========================================================================
 
 USE ROLE SYSADMIN;
 USE DATABASE PROD_RAW_DB;
-
--- --------------------------------------------------------------------------
--- Enable change tracking on source tables in all three environments.
--- Required for dbt dynamic_table models (refresh_mode = INCREMENTAL).
--- The clones in 02 are made before this runs, so they need explicit alters.
--- --------------------------------------------------------------------------
-ALTER TABLE PROD_RAW_DB.ORACLE.PROV   SET CHANGE_TRACKING = TRUE;
-ALTER TABLE PROD_RAW_DB.ORACLE.VENDOR SET CHANGE_TRACKING = TRUE;
-ALTER TABLE DEV_RAW_DB.ORACLE.PROV    SET CHANGE_TRACKING = TRUE;
-ALTER TABLE DEV_RAW_DB.ORACLE.VENDOR  SET CHANGE_TRACKING = TRUE;
-ALTER TABLE TEST_RAW_DB.ORACLE.PROV   SET CHANGE_TRACKING = TRUE;
-ALTER TABLE TEST_RAW_DB.ORACLE.VENDOR SET CHANGE_TRACKING = TRUE;
 
 -- --------------------------------------------------------------------------
 -- Stored procedure: INSERT_INCREMENTAL_DATA
@@ -197,7 +183,6 @@ AS
 --   because the cloned tables carry PROD's grants, not DEV's.
 --   FUTURE TABLE grants require MANAGE GRANTS (even for the owner) and are
 --   intentionally omitted — the cloned schema is static post-clone.
---   CHANGE_TRACKING is a table property and is carried over by the clone.
 -- --------------------------------------------------------------------------
 CREATE OR REPLACE PROCEDURE PROD_RAW_DB.PUBLIC.REFRESH_DEV_TEST_CLONES()
   RETURNS VARCHAR

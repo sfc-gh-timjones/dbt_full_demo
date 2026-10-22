@@ -79,7 +79,7 @@ Each environment has its own raw source database, analytics output database, war
 │  ┌─ DEV_ANALYTICS_DB ───────────────────────────────────────────┐  │
 │  │  STAGING        views                                        │  │
 │  │  INTERMEDIATE   tables                                       │  │
-│  │  MARTS          incremental + Dynamic Table                  │  │
+│  │  MARTS          incremental                          │
 │  └──────────────────────────────────────────────────────────────┘  │
 │                                                                    │
 │  Owned by SYSADMIN — developers write interactively               │
@@ -98,7 +98,7 @@ Each environment has its own raw source database, analytics output database, war
 │  ┌─ TEST_ANALYTICS_DB ──────────────────────────────────────────┐  │
 │  │  STAGING        views                                        │  │
 │  │  INTERMEDIATE   tables                                       │  │
-│  │  MARTS          incremental + Dynamic Table                  │  │
+│  │  MARTS          incremental                          │
 │  └──────────────────────────────────────────────────────────────┘  │
 │                                                                    │
 │  Owned by TEST_ANALYTICS_RL — CI/CD only (future phase)           │
@@ -118,7 +118,7 @@ Each environment has its own raw source database, analytics output database, war
 │  ┌─ PROD_ANALYTICS_DB ──────────────────────────────────────────┐  │
 │  │  STAGING        views                                        │  │
 │  │  INTERMEDIATE   tables                                       │  │
-│  │  MARTS          incremental + Dynamic Table                  │  │
+│  │  MARTS          incremental                          │
 │  └──────────────────────────────────────────────────────────────┘  │
 │                                                                    │
 │  Owned by PROD_ANALYTICS_RL — CI/CD only (future phase)           │
@@ -167,11 +167,9 @@ Each environment has its own raw source database, analytics output database, war
 │    picks up rows on or after the current max last_modified_date    │
 │                                                                    │
 │  fct_provider_county_summary                                       │
-│    materialization: DYNAMIC TABLE                                  │
-│    target_lag: 1 hour   refresh_mode: INCREMENTAL                  │
-│    auto-refreshes in PROD; requires --full-refresh in DEV/TEST     │
-│    after each re-clone (clone replaces the source schema,          │
-│    breaking the Dynamic Table's change stream)                     │
+│    materialization: INCREMENTAL                                    │
+│    unique_key: [county, provider_type]                             │
+│    re-aggregates affected groups on each run                       │
 └────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -245,8 +243,7 @@ SYSADMIN owns all raw databases and the task/procedure objects in `PROD_RAW_DB.P
 | `DAILY_DATA_INSERT` | Root task; fires 8am MT; inserts ~225 records into PROD |
 | `DAILY_CLONE_REFRESH` | Child task; fires after insert; re-clones ORACLE schema into DEV and TEST |
 | `dim_provider` | Incremental model; merges on `provider_id`; picks up rows on or after watermark |
-| `fct_provider_county_summary` | Snowflake Dynamic Table; 1-hour lag; breaks after re-clone until `--full-refresh` |
-| `CHANGE_TRACKING` | Enabled on PROV + VENDOR in all three raw DBs; required by the Dynamic Table |
+| `fct_provider_county_summary` | Incremental aggregate; re-aggregates county + provider_type groups that had changes since last run |
 | zero-copy clone | Instant schema copy with no storage cost until data diverges |
 | `--full-refresh` | Rebuilds all models from scratch; required in DEV/TEST after each re-clone |
 | `env_var()` in dbt | Reads `DBT_CURRENT_ROLE`, `DBT_DATABASE`, `DBT_WAREHOUSE`, `DBT_SOURCE_DB` at runtime |

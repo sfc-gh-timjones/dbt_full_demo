@@ -28,10 +28,9 @@ models:
 
   - name: fct_provider_county_summary
     description: >
-      Provider counts aggregated by county and provider type. Materialized as a
-      Snowflake Dynamic Table with a 1-hour target lag. Snowflake refreshes this
-      automatically when upstream source data changes — no dbt job needed.
-      CHANGE_TRACKING on PROV (source table) is enabled in 04_incremental_data.sql.
+      Provider counts aggregated by county and provider type. Materialized as an
+      incremental table: on each run, re-aggregates only the county + provider_type
+      groups that contain providers modified since the last run.
     columns:
       - name: county
         tests: [not_null]
