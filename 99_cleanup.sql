@@ -4,8 +4,7 @@
 -- Order matters:
 --   1. Suspend and drop tasks first (SYSADMIN — owns all tasks)
 --   2. Drop procedures explicitly (SYSADMIN — owns all raw DB objects)
---   3. Drop dbt project + Git repo objects (SYSADMIN — owns DEV_ANALYTICS_DB)
---   4. Drop databases as their owning role:
+--   3. Drop databases as their owning role (dbt project + Git repo cascade):
 --        SYSADMIN          → DEV_ANALYTICS_DB, DEV/TEST/PROD_RAW_DB
 --        TEST_ANALYTICS_RL → TEST_ANALYTICS_DB  (ownership transferred in 03)
 --        PROD_ANALYTICS_RL → PROD_ANALYTICS_DB  (ownership transferred in 03)
@@ -47,14 +46,9 @@ DROP PROCEDURE IF EXISTS PROD_RAW_DB.PUBLIC.INSERT_INCREMENTAL_DATA();
 DROP PROCEDURE IF EXISTS PROD_RAW_DB.PUBLIC.SETUP_DEMO_DATA();
 
 -- --------------------------------------------------------------------------
--- dbt project + Git repository objects (script 05)
--- Owned by SYSADMIN (inside DEV_ANALYTICS_DB). Drop before the DB.
--- --------------------------------------------------------------------------
-DROP DBT PROJECT    IF EXISTS DEV_ANALYTICS_DB.PUBLIC.DBT_FULL_DEMO;
-DROP GIT REPOSITORY IF EXISTS DEV_ANALYTICS_DB.PUBLIC.DBT_FULL_DEMO_REPO;
-
--- --------------------------------------------------------------------------
 -- DEV_ANALYTICS_DB and all raw databases — owned by SYSADMIN
+-- Dropping the database cascades to all objects inside it, including the
+-- DBT_FULL_DEMO dbt project and DBT_FULL_DEMO_REPO git repository (script 05).
 -- --------------------------------------------------------------------------
 DROP DATABASE IF EXISTS DEV_ANALYTICS_DB;
 DROP DATABASE IF EXISTS DEV_RAW_DB;
