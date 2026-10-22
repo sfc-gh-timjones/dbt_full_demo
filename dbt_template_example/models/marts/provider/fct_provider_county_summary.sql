@@ -10,11 +10,11 @@
 
 with providers as (
     select * from {{ ref('stg_oracle__providers') }}
-),
+)
 
 {% if is_incremental() %}
 
-affected_groups as (
+, affected_groups as (
     select distinct county, provider_type
     from providers
     where last_modified_date >= (select max(latest_modified_date) from {{ this }})
