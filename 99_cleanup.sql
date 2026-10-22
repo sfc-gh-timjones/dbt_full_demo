@@ -5,25 +5,25 @@
 --   1. Suspend and drop tasks first (SYSADMIN — owns all tasks)
 --   2. Drop procedures explicitly (SYSADMIN — owns all raw DB objects)
 --   3. Drop databases as their owning role (dbt project + Git repo cascade):
---        SYSADMIN          → DEV_ANALYTICS_DB, DEV/TEST/PROD_RAW_DB
+--        SYSADMIN          → ANALYTICS_ADMIN_DB, DEV_ANALYTICS_DB, DEV/TEST/PROD_RAW_DB
 --        TEST_ANALYTICS_RL → TEST_ANALYTICS_DB  (ownership transferred in 03)
 --        PROD_ANALYTICS_RL → PROD_ANALYTICS_DB  (ownership transferred in 03)
---   5. Drop warehouses (ACCOUNTADMIN — created them)
---   6. Revoke account-level privilege granted to SYSADMIN in script 03
---   7. Drop roles last (DROP ROLE auto-revokes from all users)
+--   4. Drop warehouses (ACCOUNTADMIN — created them)
+--   5. Revoke account-level privilege granted to SYSADMIN in script 03
+--   6. Drop roles last (DROP ROLE auto-revokes from all users)
 -- ==========================================================================
 
 -- --------------------------------------------------------------------------
 -- Tasks: dbt execution tasks (script 05)
--- Owned by SYSADMIN. Drop before analytics databases that hold the project.
+-- Owned by SYSADMIN. Live in ANALYTICS_ADMIN_DB — drop before that DB.
 -- --------------------------------------------------------------------------
 USE ROLE SYSADMIN;
 
-ALTER TASK IF EXISTS PROD_RAW_DB.PUBLIC.DAILY_DBT_TEST SUSPEND;
-DROP TASK  IF EXISTS PROD_RAW_DB.PUBLIC.DAILY_DBT_TEST;
+ALTER TASK IF EXISTS ANALYTICS_ADMIN_DB.PUBLIC.DAILY_DBT_TEST SUSPEND;
+DROP TASK  IF EXISTS ANALYTICS_ADMIN_DB.PUBLIC.DAILY_DBT_TEST;
 
-ALTER TASK IF EXISTS PROD_RAW_DB.PUBLIC.DAILY_DBT_PROD SUSPEND;
-DROP TASK  IF EXISTS PROD_RAW_DB.PUBLIC.DAILY_DBT_PROD;
+ALTER TASK IF EXISTS ANALYTICS_ADMIN_DB.PUBLIC.DAILY_DBT_PROD SUSPEND;
+DROP TASK  IF EXISTS ANALYTICS_ADMIN_DB.PUBLIC.DAILY_DBT_PROD;
 
 -- --------------------------------------------------------------------------
 -- Tasks: daily data insert + clone refresh (script 04)
@@ -46,9 +46,14 @@ DROP PROCEDURE IF EXISTS PROD_RAW_DB.PUBLIC.INSERT_INCREMENTAL_DATA();
 DROP PROCEDURE IF EXISTS PROD_RAW_DB.PUBLIC.SETUP_DEMO_DATA();
 
 -- --------------------------------------------------------------------------
+-- ANALYTICS_ADMIN_DB — owned by SYSADMIN (script 05)
+-- Dropping cascades to the DBT_FULL_DEMO project object.
+-- --------------------------------------------------------------------------
+DROP DATABASE IF EXISTS ANALYTICS_ADMIN_DB;
+
+-- --------------------------------------------------------------------------
 -- DEV_ANALYTICS_DB and all raw databases — owned by SYSADMIN
--- Dropping the database cascades to all objects inside it, including the
--- DBT_FULL_DEMO dbt project and DBT_FULL_DEMO_REPO git repository (script 05).
+-- Dropping cascades to the DBT_FULL_DEMO_REPO git repository (script 05).
 -- --------------------------------------------------------------------------
 DROP DATABASE IF EXISTS DEV_ANALYTICS_DB;
 DROP DATABASE IF EXISTS DEV_RAW_DB;

@@ -36,7 +36,7 @@ ALTER API INTEGRATION GIT_HUB_INTEGRATION
 
 1. In Snowsight, open **Projects → Workspaces** and choose **New Workspace → From Git Repository**.
 2. Paste the repo URL: `https://github.com/sfc-gh-timjones/dbt_full_demo`
-3. Give the workspace a name (or leave the default).
+3. Name the workspace exactly **`dbt_full_demo`** — Step 8 references this name in the snow:// workspace path.
 4. Select the integration created in Step 1.
 5. Choose **Public repository**.
 6. Click **Create**.
@@ -149,9 +149,9 @@ Set **Environment** to `prod` and click **Build**.
 **Run script:** `05_dbt_project_setup.sql` — open in a SQL Worksheet and run top to bottom, all at once.
 
 Creates:
-- `GIT_HUB_INTEGRATION` usage granted to SYSADMIN (so it can create the Git repo object)
+- `ANALYTICS_ADMIN_DB` — a SYSADMIN-owned database that houses the dbt project object and tasks; `TEST_ANALYTICS_RL` and `PROD_ANALYTICS_RL` are granted USAGE
 - `DEV_ANALYTICS_DB.PUBLIC.DBT_FULL_DEMO_REPO` — Git repository object pointing to the GitHub repo
-- `DEV_ANALYTICS_DB.PUBLIC.DBT_FULL_DEMO` — Snowflake-native dbt project object built from `dbt_template_example/`
+- `ANALYTICS_ADMIN_DB.PUBLIC.DBT_FULL_DEMO` — Snowflake-native dbt project object sourced directly from the `dbt_full_demo` workspace (avoids a server-side GitHub clone)
 - `DAILY_DBT_TEST` task — fires at 9am MT; runs `dbt build` against the `test` environment
 - `DAILY_DBT_PROD` task — fires at 9am MT; runs `dbt build` against the `prod` environment
 
