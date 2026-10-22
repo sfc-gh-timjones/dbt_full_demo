@@ -201,9 +201,21 @@ Each environment has its own raw source database, analytics output database, war
 │                                                                    │
 │  (same pattern for TEST_RAW_DB)                                    │
 └────────────────────────────────────────────────────────────────────┘
+
+9:00 AM MT (America/Denver)  — after data insert + clone refresh complete
+          │
+          ├──────────────────────────┐
+          │                         │
+          ▼                         ▼
+┌─ DAILY_DBT_TEST ───────────┐  ┌─ DAILY_DBT_PROD ───────────────────┐
+│  EXECUTE DBT PROJECT        │  │  EXECUTE DBT PROJECT               │
+│    DBT_FULL_DEMO            │  │    DBT_FULL_DEMO                   │
+│    ENVIRONMENT = 'test'     │  │    ENVIRONMENT = 'prod'            │
+│  Writes to TEST_ANALYTICS_DB│  │  Writes to PROD_ANALYTICS_DB       │
+└─────────────────────────────┘  └────────────────────────────────────┘
 ```
 
-Both tasks live in `PROD_RAW_DB.PUBLIC`. Resume order: child (`DAILY_CLONE_REFRESH`) must be resumed before root (`DAILY_DATA_INSERT`).
+All four tasks live in `PROD_RAW_DB.PUBLIC`. The dbt project object lives in `DEV_ANALYTICS_DB.PUBLIC.DBT_FULL_DEMO`, backed by the `DEV_ANALYTICS_DB.PUBLIC.DBT_FULL_DEMO_REPO` Git repository object.
 
 ---
 

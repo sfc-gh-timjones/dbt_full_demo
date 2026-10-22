@@ -139,6 +139,30 @@ If the build output shows **"Query could not start"**, click **Build** again and
 
 ---
 
+## Step 8 — Create the dbt project object and daily tasks
+
+**Run script:** `05_dbt_project_setup.sql` — open in a SQL Worksheet and run top to bottom, all at once.
+
+Creates:
+- `GIT_HUB_INTEGRATION` usage granted to SYSADMIN (so it can create the Git repo object)
+- `DEV_ANALYTICS_DB.PUBLIC.DBT_FULL_DEMO_REPO` — Git repository object pointing to the GitHub repo
+- `DEV_ANALYTICS_DB.PUBLIC.DBT_FULL_DEMO` — Snowflake-native dbt project object built from `dbt_template_example/`
+- `DAILY_DBT_TEST` task — fires at 9am MT; runs `dbt build` against the `test` environment
+- `DAILY_DBT_PROD` task — fires at 9am MT; runs `dbt build` against the `prod` environment
+
+Both tasks fire at 9am MT — one hour after `DAILY_DATA_INSERT` and `DAILY_CLONE_REFRESH` (8am MT) have completed.
+
+> **Note:** These tasks run as SYSADMIN. In the CI/CD phase they would be replaced by pipeline jobs running as `TEST_ANALYTICS_RL` and `PROD_ANALYTICS_RL` with least-privilege access.
+
+To trigger immediately without waiting for the schedule:
+
+```sql
+EXECUTE TASK PROD_RAW_DB.PUBLIC.DAILY_DBT_TEST;
+EXECUTE TASK PROD_RAW_DB.PUBLIC.DAILY_DBT_PROD;
+```
+
+---
+
 ## CI/CD (Future Phase)
 
 Automating promotion from dev → test → prod via a CI/CD pipeline is the next phase. The intended flow:

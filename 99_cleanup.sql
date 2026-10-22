@@ -9,6 +9,18 @@
 -- ==========================================================================
 
 -- --------------------------------------------------------------------------
+-- dbt project tasks and objects  (SYSADMIN — task owner)
+-- Drop dbt tasks before dropping analytics databases that hold the project.
+-- --------------------------------------------------------------------------
+USE ROLE SYSADMIN;
+
+ALTER TASK IF EXISTS PROD_RAW_DB.PUBLIC.DAILY_DBT_TEST SUSPEND;
+DROP TASK           IF EXISTS PROD_RAW_DB.PUBLIC.DAILY_DBT_TEST;
+
+ALTER TASK IF EXISTS PROD_RAW_DB.PUBLIC.DAILY_DBT_PROD SUSPEND;
+DROP TASK           IF EXISTS PROD_RAW_DB.PUBLIC.DAILY_DBT_PROD;
+
+-- --------------------------------------------------------------------------
 -- Scheduled tasks  (SYSADMIN — task owner)
 -- Both tasks live in PROD_RAW_DB.PUBLIC. Drop child before root, and both
 -- before dropping PROD_RAW_DB.
