@@ -79,7 +79,7 @@ Each environment has its own raw source database, analytics output database, war
 │  ┌─ DEV_ANALYTICS_DB ───────────────────────────────────────────┐  │
 │  │  STAGING        views                                        │  │
 │  │  INTERMEDIATE   tables                                       │  │
-│  │  MARTS          incremental                          │
+│  │  MARTS          incremental                                  │  │
 │  └──────────────────────────────────────────────────────────────┘  │
 │                                                                    │
 │  Owned by SYSADMIN — developers write interactively               │
@@ -98,7 +98,7 @@ Each environment has its own raw source database, analytics output database, war
 │  ┌─ TEST_ANALYTICS_DB ──────────────────────────────────────────┐  │
 │  │  STAGING        views                                        │  │
 │  │  INTERMEDIATE   tables                                       │  │
-│  │  MARTS          incremental                          │
+│  │  MARTS          incremental                                  │  │
 │  └──────────────────────────────────────────────────────────────┘  │
 │                                                                    │
 │  Owned by TEST_ANALYTICS_RL — CI/CD only (future phase)           │
@@ -118,7 +118,7 @@ Each environment has its own raw source database, analytics output database, war
 │  ┌─ PROD_ANALYTICS_DB ──────────────────────────────────────────┐  │
 │  │  STAGING        views                                        │  │
 │  │  INTERMEDIATE   tables                                       │  │
-│  │  MARTS          incremental                          │
+│  │  MARTS          incremental                                  │  │
 │  └──────────────────────────────────────────────────────────────┘  │
 │                                                                    │
 │  Owned by PROD_ANALYTICS_RL — CI/CD only (future phase)           │

@@ -149,6 +149,7 @@ Set **Environment** to `prod` and click **Build**.
 **Run script:** `05_dbt_project_setup.sql` — open in a SQL Worksheet and run top to bottom, all at once.
 
 Creates:
+
 - `ANALYTICS_ADMIN_DB` — a SYSADMIN-owned database that houses the dbt project object and tasks; `TEST_ANALYTICS_RL` and `PROD_ANALYTICS_RL` are granted USAGE
 - `DEV_ANALYTICS_DB.PUBLIC.DBT_FULL_DEMO_REPO` — Git repository object pointing to the GitHub repo
 - `ANALYTICS_ADMIN_DB.PUBLIC.DBT_FULL_DEMO` — Snowflake-native dbt project object sourced directly from the `dbt_full_demo` workspace (avoids a server-side GitHub clone)
@@ -164,8 +165,8 @@ Both tasks fire at 9am MT — one hour after `DAILY_DATA_INSERT` and `DAILY_CLON
 To trigger immediately without waiting for the schedule:
 
 ```sql
-EXECUTE TASK PROD_RAW_DB.PUBLIC.DAILY_DBT_TEST;
-EXECUTE TASK PROD_RAW_DB.PUBLIC.DAILY_DBT_PROD;
+EXECUTE TASK ANALYTICS_ADMIN_DB.PUBLIC.DAILY_DBT_TEST;
+EXECUTE TASK ANALYTICS_ADMIN_DB.PUBLIC.DAILY_DBT_PROD;
 ```
 
 ---
